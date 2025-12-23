@@ -129,6 +129,28 @@ main {
   margin: 0 auto 2rem;
 }
 
+.quick-links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.quick-links a {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.quick-links a:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  text-decoration: none;
+}
+
 /* Search */
 .search-container {
   max-width: 600px;
@@ -454,6 +476,47 @@ main {
   margin: 1rem 0;
   padding-left: 1rem;
   color: var(--text-muted);
+}
+
+/* Tables */
+.doc-content .table-wrapper,
+.kb-content .table-wrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.doc-content table, .kb-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 1.5rem 0;
+}
+
+.doc-content thead, .kb-content thead {
+  background: var(--bg-card);
+}
+
+.doc-content th, .kb-content th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--border);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.doc-content td, .kb-content td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.doc-content tr:hover, .kb-content tr:hover {
+  background: var(--bg-hover);
+}
+
+.doc-content tbody tr:last-child td,
+.kb-content tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /* Related KB */

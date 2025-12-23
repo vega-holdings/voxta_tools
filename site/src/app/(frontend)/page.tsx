@@ -32,6 +32,11 @@ export default async function HomePage() {
           Search across all docs and knowledge base articles.
         </p>
         <SearchForm />
+        <div className="quick-links">
+          <Link href="/docs">Documentation</Link>
+          <Link href="/kb">Knowledge Base</Link>
+          <Link href="/leaderboard">Top Contributors</Link>
+        </div>
       </section>
 
       <section className="content-grid">

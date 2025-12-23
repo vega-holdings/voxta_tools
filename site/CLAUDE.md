@@ -17,8 +17,18 @@ A searchable documentation site for Voxta built with:
 
 | Collection | Count | Description |
 |------------|-------|-------------|
-| docs-pages | 80 | Official documentation from doc.voxta.ai |
+| docs-pages | 84 | Official documentation + dev guides |
 | kb-articles | 1,005 | Community knowledge base articles |
+
+### Doc Categories
+
+Docs are organized by category with sort order:
+- `documentation` - Overview, getting started, glossary, terms
+- `installing` - Install/update server
+- `interface` - UI screens and features
+- `creator-studio` - Scenarios, memory books, actions, scripting
+- `modules` - Service providers (LLM, TTS, STT, etc.)
+- `articles` - Guides, FAQs, dev documentation
 
 ## Commands
 
@@ -47,9 +57,10 @@ site/
 │   │   ├── (frontend)/           # Public pages
 │   │   │   ├── docs/[slug]/      # Doc detail pages
 │   │   │   ├── kb/[slug]/        # KB article pages
-│   │   │   ├── docs/page.tsx     # Docs list
+│   │   │   ├── docs/page.tsx     # Docs list (grouped by category)
 │   │   │   ├── kb/page.tsx       # KB list
-│   │   │   └── page.tsx          # Homepage with search
+│   │   │   ├── leaderboard/      # Top contributors page
+│   │   │   └── page.tsx          # Homepage with search + quick-links
 │   │   ├── (payload)/            # PayloadCMS admin UI
 │   │   └── api/
 │   │       ├── search/route.ts   # Vector search endpoint
@@ -72,7 +83,9 @@ site/
 ### Collections
 
 **DocsPages** (`src/collections/DocsPages.ts`)
-- Fields: title, slug, content (textarea), category, originalUrl, relatedKB
+- Fields: title, slug, content (textarea), category, sortOrder, originalUrl, relatedKB
+- `category`: One of documentation, installing, interface, creator-studio, modules, articles
+- `sortOrder`: Number for ordering within category (lower = first)
 
 **KBArticles** (`src/collections/KBArticles.ts`)
 - Fields: title, slug, content (textarea), type, category, topics[], keywords[], confidence, contributor

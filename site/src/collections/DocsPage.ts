@@ -44,17 +44,23 @@ export const DocsPage: CollectionConfig = {
       name: 'category',
       type: 'select',
       options: [
-        { label: 'Getting Started', value: 'getting-started' },
-        { label: 'Installation', value: 'installation' },
+        { label: 'Documentation', value: 'documentation' },
+        { label: 'Installing', value: 'installing' },
         { label: 'Interface', value: 'interface' },
         { label: 'Creator Studio', value: 'creator-studio' },
-        { label: 'Services', value: 'services' },
+        { label: 'Modules', value: 'modules' },
         { label: 'Articles', value: 'articles' },
-        { label: 'FAQ', value: 'faq' },
-        { label: 'About', value: 'about' },
       ],
       admin: {
         description: 'Documentation category',
+      },
+    },
+    {
+      name: 'sortOrder',
+      type: 'number',
+      defaultValue: 100,
+      admin: {
+        description: 'Order within category (lower = first)',
       },
     },
     {

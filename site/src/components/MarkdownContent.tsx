@@ -47,6 +47,18 @@ function MarkdownLink({ href, children }: MarkdownLinkProps) {
   return <Link href={url}>{children}</Link>
 }
 
+interface MarkdownTableProps {
+  children?: React.ReactNode
+}
+
+function MarkdownTable({ children }: MarkdownTableProps) {
+  return (
+    <div className="table-wrapper">
+      <table>{children}</table>
+    </div>
+  )
+}
+
 interface MarkdownContentProps {
   content: string
   stripTitle?: boolean
@@ -63,6 +75,7 @@ export function MarkdownContent({ content, stripTitle = true }: MarkdownContentP
       remarkPlugins={[remarkGfm]}
       components={{
         a: MarkdownLink,
+        table: MarkdownTable,
       }}
     >
       {processedContent}

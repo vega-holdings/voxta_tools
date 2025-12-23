@@ -10,43 +10,72 @@ export const metadata = {
   description: 'Browse all Voxta documentation pages',
 }
 
+// Ordered list of categories with display labels
+const categoryOrder = [
+  { value: 'documentation', label: 'Documentation' },
+  { value: 'installing', label: 'Installing' },
+  { value: 'interface', label: 'Interface' },
+  { value: 'creator-studio', label: 'Creator Studio' },
+  { value: 'modules', label: 'Modules' },
+  { value: 'articles', label: 'Articles' },
+]
+
+const categoryLabels: Record<string, string> = Object.fromEntries(
+  categoryOrder.map(c => [c.value, c.label])
+)
+
 export default async function DocsListPage() {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
   const docs = await payload.find({
     collection: 'docs-pages',
-    limit: 100,
-    sort: 'title',
+    limit: 200,
+    sort: 'sortOrder',
   })
 
   // Group docs by category
   const grouped = docs.docs.reduce((acc, doc) => {
-    const category = doc.category || 'Other'
+    const category = doc.category || 'other'
     if (!acc[category]) acc[category] = []
     acc[category].push(doc)
     return acc
   }, {} as Record<string, typeof docs.docs>)
 
-  const categories = Object.keys(grouped).sort()
+  // Sort docs within each category by sortOrder then title
+  for (const category of Object.keys(grouped)) {
+    grouped[category].sort((a, b) => {
+      const orderA = (a.sortOrder as number) ?? 100
+      const orderB = (b.sortOrder as number) ?? 100
+      if (orderA !== orderB) return orderA - orderB
+      return (a.title || '').localeCompare(b.title || '')
+    })
+  }
+
+  // Get ordered categories (only those with docs)
+  const orderedCategories = categoryOrder
+    .map(c => c.value)
+    .filter(c => grouped[c]?.length > 0)
+
+  // Add any uncategorized at the end
+  const otherCategories = Object.keys(grouped).filter(
+    c => !categoryOrder.find(co => co.value === c)
+  )
 
   return (
     <div className="docs-list-page">
       <h1>Documentation</h1>
 
-      {categories.map((category) => (
+      {[...orderedCategories, ...otherCategories].map((category) => (
         <section key={category} style={{ marginBottom: '2rem' }}>
           <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-            {category}
+            {categoryLabels[category] || category}
           </h2>
           <div className="docs-grid">
             {grouped[category].map((doc) => (
               <div key={doc.id} className="doc-card">
                 <Link href={`/docs/${doc.slug}`}>
                   <h3>{doc.title}</h3>
-                  <div className="meta">
-                    {doc.category && <span>{doc.category}</span>}
-                  </div>
                 </Link>
               </div>
             ))}
