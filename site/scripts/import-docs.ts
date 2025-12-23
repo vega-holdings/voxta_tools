@@ -56,7 +56,7 @@ async function login(): Promise<string> {
     throw new Error(`Login failed: ${response.statusText}`)
   }
 
-  const data = await response.json()
+  const data = await response.json() as { token: string }
   console.log('Logged in successfully')
   return data.token
 }
