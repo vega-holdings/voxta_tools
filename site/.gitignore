@@ -52,3 +52,9 @@ node_modules/
 # OpenNext
 .open-next
 .wrangler
+
+# Import scripts and generated SQL
+*.sql
+clean-import-*.cjs
+gen-kb-sql.cjs
+populate-vectors.js
