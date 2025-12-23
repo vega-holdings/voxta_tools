@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
+import { getCloudflareContext } from '@opennextjs/cloudflare'
 
 export const runtime = 'edge'
 
@@ -17,6 +16,14 @@ interface DiscordTokens {
   expires_in: number
   refresh_token: string
   scope: string
+}
+
+interface D1User {
+  id: number
+  discord_id: string
+  username: string
+  display_name: string
+  avatar: string | null
 }
 
 export async function GET(request: NextRequest) {
@@ -65,58 +72,46 @@ export async function GET(request: NextRequest) {
     }
 
     const discordUser: DiscordUser = await userResponse.json()
+    const avatarUrl = discordUser.avatar
+      ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
+      : null
+    const displayName = discordUser.global_name || discordUser.username
+    const now = new Date().toISOString()
 
-    // Store/update user in Payload
-    const payloadConfig = await config
-    const payload = await getPayload({ config: payloadConfig })
+    // Use D1 directly instead of Payload (edge compatible)
+    const { env } = await getCloudflareContext()
+    const db = env.D1
 
     // Check if user exists
-    const existing = await payload.find({
-      collection: 'discord-users',
-      where: { discordId: { equals: discordUser.id } },
-      limit: 1,
-    })
+    const existing = await db.prepare(
+      'SELECT id, discord_id, username, display_name, avatar FROM discord_users WHERE discord_id = ?'
+    ).bind(discordUser.id).first<D1User>()
 
-    let user
-    if (existing.docs.length > 0) {
+    let userId: number
+
+    if (existing) {
       // Update existing user
-      user = await payload.update({
-        collection: 'discord-users',
-        id: existing.docs[0].id,
-        data: {
-          username: discordUser.username,
-          displayName: discordUser.global_name || discordUser.username,
-          avatar: discordUser.avatar
-            ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
-            : null,
-          lastLogin: new Date().toISOString(),
-        },
-      })
+      await db.prepare(
+        'UPDATE discord_users SET username = ?, display_name = ?, avatar = ?, last_login = ?, updated_at = ? WHERE id = ?'
+      ).bind(discordUser.username, displayName, avatarUrl, now, now, existing.id).run()
+      userId = existing.id
     } else {
       // Create new user
-      user = await payload.create({
-        collection: 'discord-users',
-        data: {
-          discordId: discordUser.id,
-          username: discordUser.username,
-          displayName: discordUser.global_name || discordUser.username,
-          avatar: discordUser.avatar
-            ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
-            : null,
-          lastLogin: new Date().toISOString(),
-        },
-      })
+      const result = await db.prepare(
+        'INSERT INTO discord_users (discord_id, username, display_name, avatar, edit_count, last_login, created_at, updated_at) VALUES (?, ?, ?, ?, 0, ?, ?, ?)'
+      ).bind(discordUser.id, discordUser.username, displayName, avatarUrl, now, now, now).run()
+      userId = result.meta.last_row_id as number
     }
 
     // Create session cookie
     const response = NextResponse.redirect(new URL('/leaderboard?login=success', request.url))
 
-    // Set a simple session cookie with user ID (in production, use signed JWT)
     response.cookies.set('discord_user', JSON.stringify({
-      id: user.id,
+      id: userId,
       discordId: discordUser.id,
       username: discordUser.username,
-      displayName: discordUser.global_name || discordUser.username,
+      displayName: displayName,
+      avatar: avatarUrl,
     }), {
       httpOnly: true,
       secure: true,
