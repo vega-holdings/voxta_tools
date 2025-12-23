@@ -2,9 +2,8 @@ import React from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import config from '@/payload.config'
+import { MarkdownContent } from '@/components/MarkdownContent'
 
 export const dynamic = 'force-dynamic'
 
@@ -64,9 +63,7 @@ export default async function KBArticlePage({ params }: PageProps) {
       </div>
 
       <div className="kb-content">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {(article.content || '').replace(/^#\s+.+\n+/, '')}
-        </ReactMarkdown>
+        <MarkdownContent content={article.content || ''} />
       </div>
 
       {topics && topics.length > 0 && (
