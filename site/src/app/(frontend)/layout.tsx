@@ -3,7 +3,7 @@ import Link from 'next/link'
 import './styles.css'
 
 export const metadata = {
-  title: 'Voxta Docs - Unofficial Documentation',
+  title: 'Voxta Unofficial Documentation',
   description: 'Unofficial community documentation for Voxta AI conversation platform with semantic search.',
 }
 
@@ -15,7 +15,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <body>
         <header className="site-header">
           <nav>
-            <Link href="/" className="logo">Voxta Docs</Link>
+            <Link href="/" className="logo">Voxta Unofficial Docs</Link>
             <div className="nav-links">
               <Link href="/docs">Docs</Link>
               <Link href="/kb">KB</Link>

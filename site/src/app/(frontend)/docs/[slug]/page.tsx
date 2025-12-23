@@ -23,10 +23,10 @@ export async function generateMetadata({ params }: PageProps) {
   })
 
   const doc = result.docs[0]
-  if (!doc) return { title: 'Not Found - Voxta Docs' }
+  if (!doc) return { title: 'Not Found - Voxta Unofficial Docs' }
 
   return {
-    title: `${doc.title} - Voxta Docs`,
+    title: `${doc.title} - Voxta Unofficial Docs`,
     description: doc.content?.slice(0, 160) || '',
   }
 }

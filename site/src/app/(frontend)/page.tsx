@@ -26,7 +26,7 @@ export default async function HomePage() {
   return (
     <div className="home-page">
       <section className="hero">
-        <h1>Voxta Documentation</h1>
+        <h1>Voxta Unofficial Documentation</h1>
         <p className="tagline">
           Unofficial community documentation for the Voxta AI conversation platform.
           Search across all docs and knowledge base articles.

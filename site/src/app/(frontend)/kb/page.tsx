@@ -6,7 +6,7 @@ import config from '@/payload.config'
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: 'Knowledge Base - Voxta Docs',
+  title: 'Knowledge Base - Voxta Unofficial Docs',
   description: 'Browse all Voxta knowledge base articles',
 }
 
