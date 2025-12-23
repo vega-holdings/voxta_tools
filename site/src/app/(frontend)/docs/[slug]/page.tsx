@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import config from '@/payload.config'
 
 export const dynamic = 'force-dynamic'
@@ -65,7 +66,9 @@ export default async function DocPage({ params }: PageProps) {
       </div>
 
       <div className="doc-content">
-        <ReactMarkdown>{doc.content || ''}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {(doc.content || '').replace(/^#\s+.+\n+/, '')}
+        </ReactMarkdown>
       </div>
 
       {relatedKB && relatedKB.length > 0 && (
