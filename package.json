@@ -1,0 +1,9 @@
+{
+  "name": "voxta-docs-repo",
+  "private": true,
+  "scripts": {
+    "build": "cd site && npm install && npm run build",
+    "deploy": "cd site && npm install && npm run deploy",
+    "dev": "cd site && npm install && npm run dev"
+  }
+}
