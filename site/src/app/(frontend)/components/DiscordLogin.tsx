@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 interface User {
   id: number
@@ -36,14 +37,16 @@ export function DiscordLogin() {
   if (user) {
     return (
       <div className="discord-user">
-        {user.avatar && <img src={user.avatar} alt="" className="discord-avatar" />}
+        {user.avatar && <Image src={user.avatar} alt="" width={24} height={24} className="discord-avatar" unoptimized />}
         <span className="discord-name">{user.displayName}</span>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/api/auth/logout" className="discord-logout">Logout</a>
       </div>
     )
   }
 
   return (
+    // eslint-disable-next-line @next/next/no-html-link-for-pages
     <a href="/api/auth/discord" className="discord-login-btn">
       Login with Discord
     </a>
