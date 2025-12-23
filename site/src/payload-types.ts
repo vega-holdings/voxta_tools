@@ -69,6 +69,8 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    'docs-pages': DocsPage;
+    'kb-articles': KBArticle;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +80,8 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'docs-pages': DocsPagesSelect<false> | DocsPagesSelect<true>;
+    'kb-articles': KBArticlesSelect<false> | KBArticlesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -156,6 +160,39 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+}
+/**
+ * DocsPage collection
+ */
+export interface DocsPage {
+  id: number;
+  title: string;
+  slug: string;
+  content?: string | null;
+  category?: 'getting-started' | 'services' | 'configuration' | 'integration' | 'troubleshooting' | 'reference' | 'other' | null;
+  originalUrl?: string | null;
+  githubPath?: string | null;
+  relatedKB?: (number | KBArticle)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * KBArticle collection
+ */
+export interface KBArticle {
+  id: number;
+  title: string;
+  slug: string;
+  content?: string | null;
+  type?: 'qa' | 'troubleshooting' | 'tip' | 'reference' | 'guide' | null;
+  category?: string | null;
+  topics?: { topic: string; id?: string | null }[] | null;
+  keywords?: { keyword: string; id?: string | null }[] | null;
+  confidence?: number | null;
+  contributor?: string | null;
+  githubPath?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -268,6 +305,31 @@ export interface MediaSelect<T extends boolean = true> {
   filesize?: T;
   width?: T;
   height?: T;
+}
+export interface DocsPagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  content?: T;
+  category?: T;
+  originalUrl?: T;
+  githubPath?: T;
+  relatedKB?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+export interface KBArticlesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  content?: T;
+  type?: T;
+  category?: T;
+  topics?: T | { topic?: T; id?: T };
+  keywords?: T | { keyword?: T; id?: T };
+  confidence?: T;
+  contributor?: T;
+  githubPath?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
