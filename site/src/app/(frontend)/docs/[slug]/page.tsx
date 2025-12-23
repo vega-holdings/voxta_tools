@@ -45,7 +45,7 @@ export default async function DocPage({ params }: PageProps) {
   if (!doc) notFound()
 
   // Get related KB articles if any
-  const relatedKB = doc.relatedKB as Array<{ id: string; title: string; slug: string }> | undefined
+  const relatedKB = doc.relatedKB as Array<{ id: number; title: string; slug: string }> | undefined
 
   return (
     <div className="doc-page">
