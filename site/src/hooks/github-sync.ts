@@ -7,7 +7,7 @@ import { getCloudflareContext } from '@opennextjs/cloudflare'
 export const githubSyncAfterChange: CollectionAfterChangeHook = async ({
   doc,
   collection,
-  operation,
+  operation: _operation,
 }) => {
   // Only sync if document has a GitHub path
   if (!doc.githubPath) {

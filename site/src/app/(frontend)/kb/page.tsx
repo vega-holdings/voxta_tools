@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 
@@ -39,13 +40,13 @@ export default async function KBListPage() {
           <div className="kb-grid">
             {grouped[category].map((article) => (
               <div key={article.id} className="kb-card">
-                <a href={`/kb/${article.slug}`}>
+                <Link href={`/kb/${article.slug}`}>
                   <h3>{article.title}</h3>
                   <div className="meta">
                     {article.type && <span>{article.type}</span>}
                     {article.confidence && <span>{Math.round(article.confidence * 100)}% confidence</span>}
                   </div>
-                </a>
+                </Link>
               </div>
             ))}
           </div>

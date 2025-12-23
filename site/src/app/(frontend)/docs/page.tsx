@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 
@@ -39,12 +40,12 @@ export default async function DocsListPage() {
           <div className="docs-grid">
             {grouped[category].map((doc) => (
               <div key={doc.id} className="doc-card">
-                <a href={`/docs/${doc.slug}`}>
+                <Link href={`/docs/${doc.slug}`}>
                   <h3>{doc.title}</h3>
                   <div className="meta">
                     {doc.category && <span>{doc.category}</span>}
                   </div>
-                </a>
+                </Link>
               </div>
             ))}
           </div>
