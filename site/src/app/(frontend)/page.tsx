@@ -4,6 +4,8 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { SearchForm } from './components/SearchForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })

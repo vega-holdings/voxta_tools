@@ -5,6 +5,8 @@ import { getPayload } from 'payload'
 import ReactMarkdown from 'react-markdown'
 import config from '@/payload.config'
 
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
   params: Promise<{ slug: string }>
 }
