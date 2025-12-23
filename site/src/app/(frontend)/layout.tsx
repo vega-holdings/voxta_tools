@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { HeaderSearch } from './components/HeaderSearch'
+import { DiscordLogin } from './components/DiscordLogin'
 import './styles.css'
 
 export const metadata = {
@@ -24,6 +25,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <Link href="/leaderboard">Leaderboard</Link>
               <a href="/admin" target="_blank">Admin</a>
               <a href="https://voxta.ai" target="_blank" rel="noopener noreferrer">Official Site</a>
+              <DiscordLogin />
             </div>
           </nav>
         </header>

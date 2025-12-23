@@ -87,6 +87,49 @@ a:hover {
   color: var(--text);
 }
 
+/* Discord Login */
+.discord-login-btn {
+  background: #5865F2;
+  color: white !important;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none !important;
+}
+
+.discord-login-btn:hover {
+  background: #4752C4;
+}
+
+.discord-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.discord-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.discord-name {
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.discord-logout {
+  color: var(--text-muted) !important;
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
+.discord-login-loading {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
 /* Header Search */
 .header-search {
   position: relative;
