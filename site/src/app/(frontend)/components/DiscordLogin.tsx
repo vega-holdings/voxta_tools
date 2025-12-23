@@ -15,13 +15,18 @@ export function DiscordLogin() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/auth/me')
-      .then(res => res.json())
-      .then(data => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/auth/me')
+        const data = await res.json() as { user: User | null }
         setUser(data.user)
+      } catch {
+        // Not logged in
+      } finally {
         setLoading(false)
-      })
-      .catch(() => setLoading(false))
+      }
+    }
+    fetchUser()
   }, [])
 
   if (loading) {
