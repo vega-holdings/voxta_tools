@@ -14,7 +14,7 @@
   "d1_databases": [
     {
       "binding": "D1",
-      "database_id": "DATABASE_ID",
+      "database_id": "81a16379-a14a-41b9-bfdd-bd0b57818138",
       "database_name": "voxta-docs",
       "remote": true
     }

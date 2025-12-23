@@ -26,6 +26,7 @@
     "import": "npx tsx scripts/import-docs.ts"
   },
   "dependencies": {
+    "@ast-grep/napi-win32-x64-msvc": "^0.40.3",
     "@opennextjs/cloudflare": "^1.11.0",
     "@payloadcms/db-d1-sqlite": "3.69.0",
     "@payloadcms/next": "3.69.0",
@@ -35,12 +36,13 @@
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
     "graphql": "^16.8.1",
+    "gray-matter": "^4.0.3",
     "next": "15.4.10",
     "payload": "3.69.0",
     "react": "19.2.1",
     "react-dom": "19.2.1",
-    "gray-matter": "^4.0.3",
-    "react-markdown": "^9.0.1"
+    "react-markdown": "^9.0.1",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",
@@ -55,11 +57,11 @@
     "playwright": "1.56.1",
     "playwright-core": "1.56.1",
     "prettier": "^3.4.2",
+    "tsx": "^4.19.0",
     "typescript": "5.7.3",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.3",
-    "wrangler": "~4.46.0",
-    "tsx": "^4.19.0"
+    "wrangler": "~4.46.0"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",
