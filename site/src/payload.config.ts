@@ -11,6 +11,7 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { DocsPage } from './collections/DocsPage'
 import { KBArticle } from './collections/KBArticle'
+import { DiscordUsers } from './collections/DiscordUsers'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -30,7 +31,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, DocsPage, KBArticle],
+  collections: [Users, Media, DocsPage, KBArticle, DiscordUsers],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

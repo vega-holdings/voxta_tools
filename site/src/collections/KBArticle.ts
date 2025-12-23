@@ -109,8 +109,60 @@ export const KBArticle: CollectionConfig = {
       name: 'contributor',
       type: 'text',
       admin: {
-        description: 'Original contributor from Discord',
+        description: 'Original contributor name from Discord',
       },
+    },
+    {
+      name: 'originalContributor',
+      type: 'relationship',
+      relationTo: 'discord-users',
+      admin: {
+        description: 'Linked Discord user who originally contributed',
+      },
+    },
+    {
+      name: 'lastEditedBy',
+      type: 'relationship',
+      relationTo: 'discord-users',
+      admin: {
+        description: 'Discord user who last edited this article',
+      },
+    },
+    {
+      name: 'lastEditedByName',
+      type: 'text',
+      admin: {
+        description: 'Name of last editor (for display)',
+      },
+    },
+    {
+      name: 'lastEditedAt',
+      type: 'date',
+      admin: {
+        description: 'When the article was last edited',
+      },
+    },
+    {
+      name: 'editHistory',
+      type: 'array',
+      admin: {
+        description: 'History of edits',
+      },
+      fields: [
+        {
+          name: 'editor',
+          type: 'relationship',
+          relationTo: 'discord-users',
+        },
+        {
+          name: 'editorName',
+          type: 'text',
+        },
+        {
+          name: 'editedAt',
+          type: 'date',
+        },
+      ],
     },
     {
       name: 'githubPath',

@@ -70,7 +70,8 @@ export interface Config {
     users: User;
     media: Media;
     'docs-pages': DocsPage;
-    'kb-articles': KBArticle;
+    'kb-articles': KbArticle;
+    'discord-users': DiscordUser;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -81,7 +82,8 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'docs-pages': DocsPagesSelect<false> | DocsPagesSelect<true>;
-    'kb-articles': KBArticlesSelect<false> | KBArticlesSelect<true>;
+    'kb-articles': KbArticlesSelect<false> | KbArticlesSelect<true>;
+    'discord-users': DiscordUsersSelect<false> | DiscordUsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -162,36 +164,174 @@ export interface Media {
   height?: number | null;
 }
 /**
- * DocsPage collection
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "docs-pages".
  */
 export interface DocsPage {
   id: number;
   title: string;
+  /**
+   * URL-friendly identifier (e.g., "getting-started")
+   */
   slug: string;
-  content?: string | null;
-  category?: 'documentation' | 'installing' | 'interface' | 'creator-studio' | 'modules' | 'articles' | null;
+  /**
+   * Markdown content
+   */
+  content: string;
+  /**
+   * Documentation category
+   */
+  category?: ('documentation' | 'installing' | 'interface' | 'creator-studio' | 'modules' | 'articles') | null;
+  /**
+   * Order within category (lower = first)
+   */
   sortOrder?: number | null;
+  /**
+   * Original URL from official docs
+   */
   originalUrl?: string | null;
+  /**
+   * Path in GitHub repo for back-sync
+   */
   githubPath?: string | null;
-  relatedKB?: (number | KBArticle)[] | null;
+  /**
+   * Related KB articles
+   */
+  relatedKB?: (number | KbArticle)[] | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * KBArticle collection
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-articles".
  */
-export interface KBArticle {
+export interface KbArticle {
   id: number;
   title: string;
+  /**
+   * URL-friendly identifier
+   */
   slug: string;
-  content?: string | null;
-  type?: 'qa' | 'troubleshooting' | 'tip' | 'reference' | 'guide' | null;
-  category?: string | null;
-  topics?: { topic: string; id?: string | null }[] | null;
-  keywords?: { keyword: string; id?: string | null }[] | null;
+  /**
+   * Markdown content
+   */
+  content: string;
+  type?: ('qa' | 'troubleshooting' | 'tip' | 'reference') | null;
+  category?:
+    | (
+        | 'configuration'
+        | 'troubleshooting'
+        | 'integrations'
+        | 'setup'
+        | 'scripting'
+        | 'llm'
+        | 'performance'
+        | 'characters'
+        | 'scenarios'
+        | 'chat'
+        | 'events'
+        | 'flags'
+      )
+    | null;
+  /**
+   * Topic tags
+   */
+  topics?:
+    | {
+        topic?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Search keywords
+   */
+  keywords?:
+    | {
+        keyword?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Confidence score (0-1)
+   */
   confidence?: number | null;
+  /**
+   * Original contributor name from Discord
+   */
   contributor?: string | null;
+  /**
+   * Linked Discord user who originally contributed
+   */
+  originalContributor?: (number | null) | DiscordUser;
+  /**
+   * Discord user who last edited this article
+   */
+  lastEditedBy?: (number | null) | DiscordUser;
+  /**
+   * Name of last editor (for display)
+   */
+  lastEditedByName?: string | null;
+  /**
+   * When the article was last edited
+   */
+  lastEditedAt?: string | null;
+  /**
+   * History of edits
+   */
+  editHistory?:
+    | {
+        editor?: (number | null) | DiscordUser;
+        editorName?: string | null;
+        editedAt?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Path in GitHub repo for back-sync
+   */
   githubPath?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discord-users".
+ */
+export interface DiscordUser {
+  id: number;
+  /**
+   * Discord user ID
+   */
+  discordId: string;
+  /**
+   * Discord username
+   */
+  username: string;
+  /**
+   * Display name (global_name or username)
+   */
+  displayName: string;
+  /**
+   * Discord avatar URL
+   */
+  avatar?: string | null;
+  /**
+   * Contributor names this user has claimed from KB articles
+   */
+  claimedContributorNames?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Number of KB edits made
+   */
+  editCount?: number | null;
+  /**
+   * Last login time
+   */
+  lastLogin?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -226,6 +366,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'docs-pages';
+        value: number | DocsPage;
+      } | null)
+    | ({
+        relationTo: 'kb-articles';
+        value: number | KbArticle;
+      } | null)
+    | ({
+        relationTo: 'discord-users';
+        value: number | DiscordUser;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -307,6 +459,10 @@ export interface MediaSelect<T extends boolean = true> {
   width?: T;
   height?: T;
 }
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "docs-pages_select".
+ */
 export interface DocsPagesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
@@ -319,17 +475,63 @@ export interface DocsPagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
 }
-export interface KBArticlesSelect<T extends boolean = true> {
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kb-articles_select".
+ */
+export interface KbArticlesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   content?: T;
   type?: T;
   category?: T;
-  topics?: T | { topic?: T; id?: T };
-  keywords?: T | { keyword?: T; id?: T };
+  topics?:
+    | T
+    | {
+        topic?: T;
+        id?: T;
+      };
+  keywords?:
+    | T
+    | {
+        keyword?: T;
+        id?: T;
+      };
   confidence?: T;
   contributor?: T;
+  originalContributor?: T;
+  lastEditedBy?: T;
+  lastEditedByName?: T;
+  lastEditedAt?: T;
+  editHistory?:
+    | T
+    | {
+        editor?: T;
+        editorName?: T;
+        editedAt?: T;
+        id?: T;
+      };
   githubPath?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discord-users_select".
+ */
+export interface DiscordUsersSelect<T extends boolean = true> {
+  discordId?: T;
+  username?: T;
+  displayName?: T;
+  avatar?: T;
+  claimedContributorNames?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  editCount?: T;
+  lastLogin?: T;
   updatedAt?: T;
   createdAt?: T;
 }
