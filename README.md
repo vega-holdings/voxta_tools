@@ -1,4 +1,5 @@
 # Voxta Unofficial Documentation
+![Gemini_Generated_Image_mvc66gmvc66gmvc6](https://github.com/user-attachments/assets/4b3ac633-41e4-4344-92dc-7ebf5a7fce5e)
 
 Unofficial community documentation for [Voxta](https://voxta.ai/) - an AI conversation platform.
 
