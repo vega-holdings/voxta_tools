@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { HeaderSearch } from './components/HeaderSearch'
 import './styles.css'
 
 export const metadata = {
@@ -16,6 +17,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         <header className="site-header">
           <nav>
             <Link href="/" className="logo">Voxta Unofficial Docs</Link>
+            <HeaderSearch />
             <div className="nav-links">
               <Link href="/docs">Docs</Link>
               <Link href="/kb">KB</Link>

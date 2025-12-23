@@ -9,7 +9,6 @@
       "Bash(node -e:*)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler pages secret put PAYLOAD_SECRET --project-name voxta-docs)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler pages project list)",
-      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 PAYLOAD_SECRET=e7d9f2e15952e5220b4acdbca31a4f98052467f53dd603697d1578acf2155e15 npx wrangler d1 execute voxta-docs --remote --file=src/migrations/20250929_111647.ts)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler whoami)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler deployments list)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler deployments list --name voxta-unoffical-docs)",
@@ -43,7 +42,6 @@
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=import-kb-18.sql)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=import-kb-19.sql)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=import-kb-20.sql)",
-      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"SELECT COUNT\\(*\\) as docs_count FROM docs_pages; SELECT COUNT\\(*\\) as kb_count FROM kb_articles;\")",
       "Bash(node clean-import-docs.cjs:*)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=clean-import-docs.sql)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=clean-import-kb-0.sql)",
@@ -84,8 +82,12 @@
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=check-dev-docs.sql)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=update-categories.sql)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"PRAGMA table_info\\(docs_pages\\);\")",
-      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"SELECT category, COUNT\\(*\\) as count FROM docs_pages GROUP BY category ORDER BY count DESC;\")",
-      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"SELECT slug FROM docs_pages ORDER BY slug LIMIT 20;\")"
+      "Bash(ls:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(node clean-import-kb.cjs:*)",
+      "Bash(for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=clean-import-kb-$i.sql)"
     ]
   }
 }
