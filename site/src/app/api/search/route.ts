@@ -45,9 +45,9 @@ export async function GET(request: Request) {
     // Generate embedding for the search query
     const embeddingResult = await env.AI.run('@cf/baai/bge-small-en-v1.5', {
       text: [query],
-    })
+    }) as { data: number[][] }
 
-    if (!embeddingResult.data || !embeddingResult.data[0]) {
+    if (!embeddingResult?.data?.[0]) {
       return NextResponse.json(
         { error: 'Failed to process search query' },
         { status: 500 }

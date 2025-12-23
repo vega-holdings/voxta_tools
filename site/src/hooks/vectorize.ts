@@ -32,9 +32,9 @@ export const vectorizeAfterChange: CollectionAfterChangeHook = async ({
     // Generate embedding using Workers AI
     const embeddingResult = await env.AI.run('@cf/baai/bge-small-en-v1.5', {
       text: [truncatedText],
-    })
+    }) as { data: number[][] }
 
-    if (!embeddingResult.data || !embeddingResult.data[0]) {
+    if (!embeddingResult?.data?.[0]) {
       console.error('[Vectorize] Failed to generate embedding')
       return doc
     }
