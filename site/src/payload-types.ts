@@ -169,7 +169,8 @@ export interface DocsPage {
   title: string;
   slug: string;
   content?: string | null;
-  category?: 'getting-started' | 'services' | 'configuration' | 'integration' | 'troubleshooting' | 'reference' | 'other' | null;
+  category?: 'documentation' | 'installing' | 'interface' | 'creator-studio' | 'modules' | 'articles' | null;
+  sortOrder?: number | null;
   originalUrl?: string | null;
   githubPath?: string | null;
   relatedKB?: (number | KBArticle)[] | null;
@@ -311,6 +312,7 @@ export interface DocsPagesSelect<T extends boolean = true> {
   slug?: T;
   content?: T;
   category?: T;
+  sortOrder?: T;
   originalUrl?: T;
   githubPath?: T;
   relatedKB?: T;
