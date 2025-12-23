@@ -26,7 +26,6 @@
     "import": "npx tsx scripts/import-docs.ts"
   },
   "dependencies": {
-    "@ast-grep/napi-win32-x64-msvc": "^0.40.3",
     "@opennextjs/cloudflare": "^1.11.0",
     "@payloadcms/db-d1-sqlite": "3.69.0",
     "@payloadcms/next": "3.69.0",
