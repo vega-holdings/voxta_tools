@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server'
 
-export const runtime = 'edge'
-
 export async function GET() {
   const clientId = process.env.DISCORD_CLIENT_ID
   const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL || 'https://voxta.axailotl.ai'}/api/auth/discord/callback`

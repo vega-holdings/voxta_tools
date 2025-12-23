@@ -94,7 +94,8 @@
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put DISCORD_CLIENT_ID --name voxta-docs)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put DISCORD_CLIENT_SECRET --name voxta-docs)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put NEXT_PUBLIC_APP_URL --name voxta-docs)",
-      "Bash(npx payload generate:types:*)"
+      "Bash(npx payload generate:types:*)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"CREATE TABLE IF NOT EXISTS discord_users \\(id INTEGER PRIMARY KEY AUTOINCREMENT, discord_id TEXT UNIQUE NOT NULL, username TEXT NOT NULL, display_name TEXT NOT NULL, avatar TEXT, edit_count INTEGER DEFAULT 0, last_login TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL\\);\")"
     ]
   }
 }
