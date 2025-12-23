@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import './styles.css'
 
 export const metadata = {
@@ -14,10 +15,10 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <body>
         <header className="site-header">
           <nav>
-            <a href="/" className="logo">Voxta Docs</a>
+            <Link href="/" className="logo">Voxta Docs</Link>
             <div className="nav-links">
-              <a href="/docs">Docs</a>
-              <a href="/kb">KB</a>
+              <Link href="/docs">Docs</Link>
+              <Link href="/kb">KB</Link>
               <a href="/admin" target="_blank">Admin</a>
               <a href="https://voxta.ai" target="_blank" rel="noopener noreferrer">Official Site</a>
             </div>

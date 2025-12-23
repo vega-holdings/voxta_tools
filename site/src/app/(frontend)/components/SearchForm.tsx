@@ -41,7 +41,7 @@ export function SearchForm() {
       }
       const data: SearchResponse = await response.json()
       setResults(data.results)
-    } catch (err) {
+    } catch (_err) {
       setError('Search is currently unavailable. Please try again later.')
       setResults([])
     } finally {
@@ -68,7 +68,7 @@ export function SearchForm() {
       {error && <p className="search-error">{error}</p>}
 
       {hasSearched && !isSearching && results.length === 0 && !error && (
-        <p className="search-no-results">No results found for "{query}"</p>
+        <p className="search-no-results">No results found for &quot;{query}&quot;</p>
       )}
 
       {results.length > 0 && (

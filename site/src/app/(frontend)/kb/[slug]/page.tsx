@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import ReactMarkdown from 'react-markdown'
@@ -48,7 +49,7 @@ export default async function KBArticlePage({ params }: PageProps) {
 
   return (
     <div className="kb-page">
-      <a href="/kb" className="back-link">&larr; Back to Knowledge Base</a>
+      <Link href="/kb" className="back-link">&larr; Back to Knowledge Base</Link>
 
       <h1>{article.title}</h1>
 

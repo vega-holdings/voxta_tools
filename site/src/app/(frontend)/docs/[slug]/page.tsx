@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import ReactMarkdown from 'react-markdown'
@@ -48,7 +49,7 @@ export default async function DocPage({ params }: PageProps) {
 
   return (
     <div className="doc-page">
-      <a href="/docs" className="back-link">&larr; Back to Docs</a>
+      <Link href="/docs" className="back-link">&larr; Back to Docs</Link>
 
       <h1>{doc.title}</h1>
 
@@ -71,7 +72,7 @@ export default async function DocPage({ params }: PageProps) {
           <ul>
             {relatedKB.map((kb) => (
               <li key={kb.id}>
-                <a href={`/kb/${kb.slug}`}>{kb.title}</a>
+                <Link href={`/kb/${kb.slug}`}>{kb.title}</Link>
               </li>
             ))}
           </ul>

@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { SearchForm } from './components/SearchForm'
@@ -38,14 +39,14 @@ export default async function HomePage() {
           <ul className="item-list">
             {recentDocs.docs.map((doc) => (
               <li key={doc.id}>
-                <a href={`/docs/${doc.slug}`}>
+                <Link href={`/docs/${doc.slug}`}>
                   <span className="item-title">{doc.title}</span>
                   {doc.category && <span className="item-category">{doc.category}</span>}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
-          <a href="/docs" className="view-all">View all docs</a>
+          <Link href="/docs" className="view-all">View all docs</Link>
         </div>
 
         <div className="section">
@@ -54,14 +55,14 @@ export default async function HomePage() {
           <ul className="item-list">
             {recentKB.docs.map((article) => (
               <li key={article.id}>
-                <a href={`/kb/${article.slug}`}>
+                <Link href={`/kb/${article.slug}`}>
                   <span className="item-title">{article.title}</span>
                   {article.type && <span className="item-type">{article.type}</span>}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
-          <a href="/kb" className="view-all">View all KB articles</a>
+          <Link href="/kb" className="view-all">View all KB articles</Link>
         </div>
       </section>
     </div>
