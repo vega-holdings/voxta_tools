@@ -121,10 +121,18 @@ site/
 }
 ```
 
+## Cloudflare Project
+
+- **Project Name**: `voxta-unoffical-docs`
+- Use `wrangler secret put <NAME> --name voxta-unoffical-docs` to set secrets
+
 ## Environment Variables
 
 - `PAYLOAD_SECRET` - Secret for Payload admin & API auth
 - `CLOUDFLARE_API_TOKEN` - For wrangler CLI operations
+- `DISCORD_CLIENT_ID` - Discord OAuth app client ID
+- `DISCORD_CLIENT_SECRET` - Discord OAuth app client secret
+- `NEXT_PUBLIC_APP_URL` - Site URL (https://voxta.axailotl.ai)
 
 ## Data Import
 

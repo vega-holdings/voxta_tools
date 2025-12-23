@@ -23,7 +23,6 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <Link href="/docs">Docs</Link>
               <Link href="/kb">KB</Link>
               <Link href="/leaderboard">Leaderboard</Link>
-              <a href="/admin" target="_blank">Admin</a>
               <a href="https://voxta.ai" target="_blank" rel="noopener noreferrer">Official Site</a>
               <DiscordLogin />
             </div>

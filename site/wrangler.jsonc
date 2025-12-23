@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
-  "name": "voxta-docs",
+  "name": "voxta-unoffical-docs",
   "compatibility_date": "2025-08-15",
   "compatibility_flags": [
     "nodejs_compat",

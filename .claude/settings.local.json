@@ -104,7 +104,13 @@
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"ALTER TABLE kb_articles ADD COLUMN last_edited_by_id INTEGER REFERENCES discord_users\\(id\\);\")",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"ALTER TABLE kb_articles ADD COLUMN last_edited_by_name TEXT;\")",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"ALTER TABLE kb_articles ADD COLUMN last_edited_at TEXT;\")",
-      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"CREATE TABLE IF NOT EXISTS kb_articles_edit_history \\(id INTEGER PRIMARY KEY AUTOINCREMENT, _parent_id INTEGER NOT NULL REFERENCES kb_articles\\(id\\), editor_id INTEGER REFERENCES discord_users\\(id\\), editor_name TEXT, edited_at TEXT, _order INTEGER NOT NULL\\);\")"
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"CREATE TABLE IF NOT EXISTS kb_articles_edit_history \\(id INTEGER PRIMARY KEY AUTOINCREMENT, _parent_id INTEGER NOT NULL REFERENCES kb_articles\\(id\\), editor_id INTEGER REFERENCES discord_users\\(id\\), editor_name TEXT, edited_at TEXT, _order INTEGER NOT NULL\\);\")",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler pages secret put DISCORD_CLIENT_SECRET --project-name voxta-docs)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler pages secret put NEXT_PUBLIC_APP_URL --project-name voxta-docs)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler pages secret put DISCORD_CLIENT_ID --project-name voxta-unoffical-docs)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put DISCORD_CLIENT_ID --name voxta-unoffical-docs)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put DISCORD_CLIENT_SECRET --name voxta-unoffical-docs)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put NEXT_PUBLIC_APP_URL --name voxta-unoffical-docs)"
     ]
   }
 }
