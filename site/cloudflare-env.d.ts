@@ -6,6 +6,11 @@ declare namespace Cloudflare {
     R2: R2Bucket
     D1: D1Database
     ASSETS: Fetcher
+    AI: Ai
+    VECTORIZE: VectorizeIndex
+    GITHUB_TOKEN?: string
+    GITHUB_OWNER?: string
+    GITHUB_REPO?: string
   }
 }
 interface CloudflareEnv extends Cloudflare.Env {}
