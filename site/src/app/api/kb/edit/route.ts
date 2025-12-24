@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCloudflareContext } from '@opennextjs/cloudflare'
+import { getPayload } from 'payload'
+import config from '@/payload.config'
 
 interface EditRequest {
   articleId: number
@@ -29,22 +30,42 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { env } = await getCloudflareContext()
-    const db = env.D1
+    const payloadConfig = await config
+    const payload = await getPayload({ config: payloadConfig })
 
     const now = new Date().toISOString()
 
-    // Update article directly in D1 (simpler, avoids hook issues)
-    await db.prepare(`
-      UPDATE kb_articles
-      SET title = ?, content = ?, last_edited_by_name = ?, last_edited_at = ?, updated_at = ?
-      WHERE id = ?
-    `).bind(title, content, user.displayName, now, now, articleId).run()
+    // Update article - only update simple fields, skip relationships
+    await payload.update({
+      collection: 'kb-articles',
+      id: articleId,
+      data: {
+        title,
+        content,
+        lastEditedByName: user.displayName,
+        lastEditedAt: now,
+      },
+    })
 
     // Increment user's edit count
-    await db.prepare(`
-      UPDATE discord_users SET edit_count = edit_count + 1, updated_at = ? WHERE id = ?
-    `).bind(now, user.id).run()
+    try {
+      const discordUser = await payload.findByID({
+        collection: 'discord-users',
+        id: user.id,
+      })
+
+      if (discordUser) {
+        await payload.update({
+          collection: 'discord-users',
+          id: user.id,
+          data: {
+            editCount: (discordUser.editCount || 0) + 1,
+          },
+        })
+      }
+    } catch {
+      // User update failed, but article was saved
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {
