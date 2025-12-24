@@ -15,9 +15,9 @@ const categoryOrder = [
   { value: 'documentation', label: 'Documentation' },
   { value: 'installing', label: 'Installing' },
   { value: 'interface', label: 'Interface' },
-  { value: 'creator-studio', label: 'Creator Studio' },
   { value: 'modules', label: 'Modules' },
-  { value: 'articles', label: 'Articles' },
+  { value: 'developers', label: 'Developers' },
+  { value: 'creators', label: 'Creators' },
 ]
 
 const categoryLabels: Record<string, string> = Object.fromEntries(

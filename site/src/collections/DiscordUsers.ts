@@ -4,7 +4,8 @@ export const DiscordUsers: CollectionConfig = {
   slug: 'discord-users',
   admin: {
     useAsTitle: 'displayName',
-    defaultColumns: ['displayName', 'username', 'discordId', 'lastLogin'],
+    defaultColumns: ['displayName', 'username', 'isGuildMember', 'isAdmin', 'editCount', 'lastLogin'],
+    listSearchableFields: ['displayName', 'username', 'discordId'],
     group: 'Users',
   },
   access: {
@@ -75,6 +76,14 @@ export const DiscordUsers: CollectionConfig = {
       },
     },
     {
+      name: 'isGuildMember',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'Is a member of the official Voxta Discord server',
+      },
+    },
+    {
       name: 'isAdmin',
       type: 'checkbox',
       defaultValue: false,
@@ -92,6 +101,24 @@ export const DiscordUsers: CollectionConfig = {
       ],
       admin: {
         description: 'How your name appears on contributions and edits',
+      },
+    },
+    {
+      name: 'favoriteKBArticles',
+      type: 'relationship',
+      relationTo: 'kb-articles',
+      hasMany: true,
+      admin: {
+        description: 'Favorited KB articles',
+      },
+    },
+    {
+      name: 'favoriteDocsPages',
+      type: 'relationship',
+      relationTo: 'docs-pages',
+      hasMany: true,
+      admin: {
+        description: 'Favorited documentation pages',
       },
     },
   ],

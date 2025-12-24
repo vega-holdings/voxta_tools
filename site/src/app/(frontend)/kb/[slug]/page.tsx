@@ -6,6 +6,7 @@ import config from '@/payload.config'
 import { MarkdownContent } from '@/components/MarkdownContent'
 import { cookies } from 'next/headers'
 import { EditButton } from './EditButton'
+import { FavoriteButton } from '../../components/FavoriteButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -72,7 +73,10 @@ export default async function KBArticlePage({ params }: PageProps) {
             </p>
           )}
         </div>
-        {isLoggedIn && <EditButton slug={slug} />}
+        <div className="kb-actions">
+          <FavoriteButton type="kb" id={article.id} />
+          {isLoggedIn && <EditButton slug={slug} />}
+        </div>
       </div>
 
       <div className="kb-meta">

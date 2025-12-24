@@ -22,7 +22,15 @@ interface D1User {
   username: string
   display_name: string
   avatar: string | null
+  is_guild_member: number | null
 }
+
+interface DiscordGuild {
+  id: string
+  name: string
+}
+
+const VOXTA_GUILD_ID = '1125594592180445284'
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code')
@@ -76,6 +84,23 @@ export async function GET(request: NextRequest) {
     const displayName = discordUser.global_name || discordUser.username
     const now = new Date().toISOString()
 
+    // Check guild membership
+    let isGuildMember = false
+    try {
+      const guildsResponse = await fetch('https://discord.com/api/users/@me/guilds', {
+        headers: { Authorization: `Bearer ${tokens.access_token}` },
+      })
+
+      if (guildsResponse.ok) {
+        const guilds: DiscordGuild[] = await guildsResponse.json()
+        isGuildMember = guilds.some(g => g.id === VOXTA_GUILD_ID)
+      } else {
+        console.error('[Auth] Failed to fetch guilds:', guildsResponse.status)
+      }
+    } catch (e) {
+      console.error('[Auth] Guild check error:', e)
+    }
+
     // Use D1 directly instead of Payload (edge compatible)
     const { env } = await getCloudflareContext()
     const db = env.D1
@@ -90,14 +115,14 @@ export async function GET(request: NextRequest) {
     if (existing) {
       // Update existing user
       await db.prepare(
-        'UPDATE discord_users SET username = ?, display_name = ?, avatar = ?, last_login = ?, updated_at = ? WHERE id = ?'
-      ).bind(discordUser.username, displayName, avatarUrl, now, now, existing.id).run()
+        'UPDATE discord_users SET username = ?, display_name = ?, avatar = ?, is_guild_member = ?, last_login = ?, updated_at = ? WHERE id = ?'
+      ).bind(discordUser.username, displayName, avatarUrl, isGuildMember ? 1 : 0, now, now, existing.id).run()
       userId = existing.id
     } else {
       // Create new user
       const result = await db.prepare(
-        'INSERT INTO discord_users (discord_id, username, display_name, avatar, edit_count, last_login, created_at, updated_at) VALUES (?, ?, ?, ?, 0, ?, ?, ?)'
-      ).bind(discordUser.id, discordUser.username, displayName, avatarUrl, now, now, now).run()
+        'INSERT INTO discord_users (discord_id, username, display_name, avatar, is_guild_member, edit_count, last_login, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?)'
+      ).bind(discordUser.id, discordUser.username, displayName, avatarUrl, isGuildMember ? 1 : 0, now, now, now).run()
       userId = result.meta.last_row_id as number
     }
 
@@ -144,6 +169,7 @@ export async function GET(request: NextRequest) {
       username: discordUser.username,
       displayName: displayName,
       avatar: avatarUrl,
+      isGuildMember: isGuildMember,
     }), {
       httpOnly: true,
       secure: true,

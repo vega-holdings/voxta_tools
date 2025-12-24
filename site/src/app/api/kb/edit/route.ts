@@ -21,11 +21,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
   }
 
-  let user: { id: number; discordId: string; username: string; displayName: string }
+  let user: { id: number; discordId: string; username: string; displayName: string; isGuildMember?: boolean }
   try {
     user = JSON.parse(userCookie.value)
   } catch {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
+  }
+
+  // Check guild membership
+  if (!user.isGuildMember) {
+    return NextResponse.json(
+      { error: 'You must be a member of the Voxta Discord server to edit articles' },
+      { status: 403 }
+    )
   }
 
   const body = await request.json() as EditRequest

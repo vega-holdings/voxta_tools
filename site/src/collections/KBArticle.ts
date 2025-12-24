@@ -6,13 +6,18 @@ export const KBArticle: CollectionConfig = {
   slug: 'kb-articles',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'category', 'type', 'confidence', 'updatedAt'],
+    defaultColumns: ['title', 'category', 'type', 'lastEditedByName', 'updatedAt'],
+    listSearchableFields: ['title', 'content', 'contributor'],
     group: 'Content',
   },
   access: {
     read: () => true,
     create: () => true,
     update: () => true,
+  },
+  versions: {
+    drafts: true,
+    maxPerDoc: 25,
   },
   hooks: {
     afterChange: [vectorizeAfterChange, githubSyncAfterChange],

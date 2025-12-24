@@ -1346,3 +1346,141 @@ main {
     gap: 0.5rem;
   }
 }
+
+/* Favorite Button */
+.favorite-button {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.favorite-button:hover {
+  color: var(--warning);
+  transform: scale(1.1);
+}
+
+.favorite-button.favorited {
+  color: var(--warning);
+}
+
+.favorite-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.kb-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Favorites Section on Account Page */
+.favorites-section {
+  margin-top: 2rem;
+}
+
+.favorites-section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.favorite-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.favorite-card a {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.favorite-card .remove-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 1rem;
+}
+
+.favorite-card .remove-btn:hover {
+  color: #ef4444;
+}
+
+/* KB Header with New Article Button */
+.kb-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.kb-header-row h1 {
+  margin: 0;
+}
+
+.new-article-btn {
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.new-article-btn:hover {
+  background: var(--primary-dark);
+  color: white;
+}
+
+/* New Article Page */
+.kb-new-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.kb-new-page h1 {
+  margin-bottom: 0.5rem;
+}
+
+.page-description {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .kb-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -121,6 +121,27 @@ export default async function AccountPage() {
     sort: '-lastEditedAt',
   })
 
+  // Get user's favorites with depth to get titles
+  let favoriteKBArticles: Array<{ id: number; title: string; slug: string }> = []
+  let favoriteDocsPages: Array<{ id: number; title: string; slug: string }> = []
+
+  if (dbUser) {
+    const userWithFavorites = await payload.findByID({
+      collection: 'discord-users',
+      id: user.id,
+      depth: 1,
+    }) as unknown as Record<string, unknown>
+
+    if (userWithFavorites?.favoriteKBArticles) {
+      favoriteKBArticles = (userWithFavorites.favoriteKBArticles as Array<{ id: number; title: string; slug: string }>)
+        .filter(f => f && typeof f === 'object')
+    }
+    if (userWithFavorites?.favoriteDocsPages) {
+      favoriteDocsPages = (userWithFavorites.favoriteDocsPages as Array<{ id: number; title: string; slug: string }>)
+        .filter(f => f && typeof f === 'object')
+    }
+  }
+
   const editCount = dbUser?.editCount || 0
   const isAdmin = (dbUser as { isAdmin?: boolean } | null)?.isAdmin || false
   const displayPreference = (dbUser as { displayPreference?: string } | null)?.displayPreference || 'username'
@@ -223,6 +244,38 @@ export default async function AccountPage() {
         )}
       </div>
 
+
+      {(favoriteKBArticles.length > 0 || favoriteDocsPages.length > 0) && (
+        <div className="favorites-section">
+          <h2>Favorites</h2>
+
+          {favoriteKBArticles.length > 0 && (
+            <div className="account-section">
+              <h3>KB Articles ({favoriteKBArticles.length})</h3>
+              <div className="favorites-grid">
+                {favoriteKBArticles.map(article => (
+                  <div key={article.id} className="favorite-card">
+                    <Link href={`/kb/${article.slug}`}>{article.title}</Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {favoriteDocsPages.length > 0 && (
+            <div className="account-section">
+              <h3>Documentation ({favoriteDocsPages.length})</h3>
+              <div className="favorites-grid">
+                {favoriteDocsPages.map(doc => (
+                  <div key={doc.id} className="favorite-card">
+                    <Link href={`/docs/${doc.slug}`}>{doc.title}</Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <SettingsForm
         currentPreference={displayPreference}

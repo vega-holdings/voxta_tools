@@ -6,11 +6,18 @@ export const DocsPage: CollectionConfig = {
   slug: 'docs-pages',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'category', 'updatedAt'],
+    defaultColumns: ['title', 'category', 'sortOrder', 'updatedAt'],
+    listSearchableFields: ['title', 'content'],
     group: 'Content',
   },
   access: {
     read: () => true,
+    create: () => true,
+    update: () => true,
+  },
+  versions: {
+    drafts: true,
+    maxPerDoc: 25,
   },
   hooks: {
     afterChange: [vectorizeAfterChange, githubSyncAfterChange],
@@ -47,9 +54,9 @@ export const DocsPage: CollectionConfig = {
         { label: 'Documentation', value: 'documentation' },
         { label: 'Installing', value: 'installing' },
         { label: 'Interface', value: 'interface' },
-        { label: 'Creator Studio', value: 'creator-studio' },
         { label: 'Modules', value: 'modules' },
-        { label: 'Articles', value: 'articles' },
+        { label: 'Developers', value: 'developers' },
+        { label: 'Creators', value: 'creators' },
       ],
       admin: {
         description: 'Documentation category',
@@ -60,6 +67,7 @@ export const DocsPage: CollectionConfig = {
       type: 'number',
       defaultValue: 100,
       admin: {
+        position: 'sidebar',
         description: 'Order within category (lower = first)',
       },
     },
@@ -86,6 +94,35 @@ export const DocsPage: CollectionConfig = {
       hasMany: true,
       admin: {
         description: 'Related KB articles',
+      },
+    },
+    {
+      name: 'lastEditedBy',
+      type: 'relationship',
+      relationTo: 'discord-users',
+      admin: {
+        description: 'Discord user who last edited this page',
+      },
+    },
+    {
+      name: 'lastEditedByName',
+      type: 'text',
+      admin: {
+        description: 'Name of last editor (for display)',
+      },
+    },
+    {
+      name: 'lastEditedByDiscordId',
+      type: 'text',
+      admin: {
+        description: 'Discord ID of last editor',
+      },
+    },
+    {
+      name: 'lastEditedAt',
+      type: 'date',
+      admin: {
+        description: 'When the page was last edited',
       },
     },
   ],

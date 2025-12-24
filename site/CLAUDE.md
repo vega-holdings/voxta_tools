@@ -12,7 +12,8 @@ A searchable documentation site for Voxta built with:
 - **Cloudflare Vectorize** - Vector search index (384 dimensions, cosine metric)
 - **Cloudflare Workers AI** - Embedding generation (`@cf/baai/bge-small-en-v1.5`)
 - **OpenNext** - Adapter for deploying Next.js to Cloudflare
-- **Discord OAuth** - User authentication via Discord
+- **Discord OAuth** - User authentication via Discord (requires Voxta Discord membership)
+- **GitHub Actions** - CI/CD for build checks
 
 ## Content
 
@@ -26,28 +27,35 @@ A searchable documentation site for Voxta built with:
 ## PayloadCMS Collections
 
 ### DocsPage (`src/collections/DocsPage.ts`)
-- Fields: title, slug, content (textarea), category, sortOrder, originalUrl, relatedKB
-- `category`: One of documentation, installing, interface, creator-studio, modules, articles
+- Fields: title, slug, content (textarea), category, sortOrder, originalUrl, relatedKB, lastEditedBy, lastEditedByName, lastEditedByDiscordId, lastEditedAt
+- `category`: One of documentation, installing, interface, modules, developers, creators
 - `sortOrder`: Number for ordering within category (lower = first)
+- **Versioning**: PayloadCMS native versioning enabled (maxPerDoc: 25)
 
 ### KBArticle (`src/collections/KBArticle.ts`)
 - Fields: title, slug, content (textarea), type, category, topics[], keywords[], confidence
 - **Contributor tracking**: contributor (original name), originalContributor, lastEditedBy, lastEditedByName, lastEditedByDiscordId, lastEditedAt, editHistory[]
 - Edit tracking fields link to DiscordUsers
+- **Versioning**: PayloadCMS native versioning enabled (maxPerDoc: 25)
 
 ### DiscordUsers (`src/collections/DiscordUsers.ts`)
-- Fields: discordId, username, displayName, avatar, claimedContributorNames[], editCount, lastLogin, isAdmin, displayPreference
+- Fields: discordId, username, displayName, avatar, claimedContributorNames[], editCount, lastLogin, isGuildMember, isAdmin, displayPreference, favoriteKBArticles, favoriteDocsPages
+- `isGuildMember`: Must be member of Voxta Discord (ID: 1125594592180445284) to edit/create
 - `claimedContributorNames`: Array of contributor names claimed/auto-linked to this user
 - `isAdmin`: Boolean for admin privileges
 - `displayPreference`: 'username' or 'displayName' - controls how name appears on edits
+- `favoriteKBArticles`: Relationship array to favorited KB articles
+- `favoriteDocsPages`: Relationship array to favorited documentation pages
 
 ## User Features
 
 ### Discord Login
 - Login button in header navigates to `/api/auth/discord`
+- OAuth scopes: `identify guilds` (to verify Voxta Discord membership)
 - OAuth callback at `/api/auth/discord/callback`
-- User session stored in `discord_user` cookie
+- User session stored in `discord_user` cookie (includes isGuildMember flag)
 - `/api/auth/me` returns current user, `/api/auth/logout` clears session
+- **Guild Check**: Verifies user is member of Voxta Discord (ID: 1125594592180445284)
 - **Auto-association**: On login, checks `contributor_mappings` table and auto-claims contributor name
 
 ### User Account Page (`/account`)
@@ -55,6 +63,7 @@ A searchable documentation site for Voxta built with:
 - Stats: original contributions, edits made, claimed names
 - Lists claimed contributor names (clickable to profile)
 - Shows original contributions and recent edits
+- **Favorites**: Shows favorited KB articles and documentation pages
 - **Settings**: Choose display preference (username vs display name)
 
 ### Contributor Profiles (`/contributor/[name]`)
@@ -63,10 +72,21 @@ A searchable documentation site for Voxta built with:
 - Claimed profiles show Discord avatar and display name
 
 ### KB Article Editing
-- Logged-in users see "Edit" button on KB articles
+- Logged-in guild members see "Edit" button on KB articles
 - Edit page at `/kb/[slug]/edit` with title and markdown content
-- `/api/kb/edit` saves changes via PayloadCMS
+- `/api/kb/edit` saves changes via PayloadCMS (requires guild membership)
 - Tracks lastEditedByName (uses user's displayPreference), lastEditedByDiscordId, lastEditedAt
+
+### KB Article Creation
+- Guild members see "+ New Article" button on KB list page
+- Create page at `/kb/new` with title, content, category, type
+- `/api/kb/create` creates new article (requires guild membership)
+- Automatically sets contributor to the creating user
+
+### Favorites
+- Star button on KB articles and documentation pages
+- Toggle favorite via `/api/favorites` (POST/DELETE)
+- View all favorites on account page
 
 ### Documentation Download
 - Doc pages have "DL .md" button to download content as markdown file
@@ -102,12 +122,13 @@ site/
 │   │   │   ├── docs/[slug]/      # Doc detail pages (with DL button)
 │   │   │   ├── kb/[slug]/        # KB article pages
 │   │   │   │   └── edit/         # KB edit page
+│   │   │   ├── kb/new/           # New KB article page
 │   │   │   ├── contributor/[name]/ # Contributor profiles
 │   │   │   ├── account/          # User account page + settings
 │   │   │   ├── docs/page.tsx     # Docs list (grouped by category)
 │   │   │   ├── kb/page.tsx       # KB list
 │   │   │   ├── leaderboard/      # Top contributors page
-│   │   │   ├── components/       # HeaderSearch, DiscordLogin, DownloadButton
+│   │   │   ├── components/       # HeaderSearch, DiscordLogin, DownloadButton, FavoriteButton
 │   │   │   └── page.tsx          # Homepage with search + quick-links
 │   │   ├── (payload)/            # PayloadCMS admin UI
 │   │   └── api/
@@ -117,6 +138,8 @@ site/
 │   │       │   ├── me/           # Get current user
 │   │       │   └── logout/       # Clear session
 │   │       ├── kb/edit/          # KB article editing
+│   │       ├── kb/create/        # KB article creation
+│   │       ├── favorites/        # Favorites API (GET/POST/DELETE)
 │   │       ├── user/settings/    # User settings (display preference)
 │   │       └── admin/
 │   │           └── populate-vectors/route.ts
@@ -130,7 +153,8 @@ site/
 │   │   └── SearchForm.tsx        # Search UI component
 │   └── payload.config.ts         # Payload configuration
 ├── wrangler.jsonc                # Cloudflare bindings config
-└── populate-vectors.js           # Script to populate Vectorize index
+├── populate-vectors.js           # Script to populate Vectorize index
+└── .github/workflows/build.yml   # CI/CD build check workflow
 ```
 
 ## API Endpoints

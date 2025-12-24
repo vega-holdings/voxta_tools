@@ -5,6 +5,7 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { MarkdownContent } from '@/components/MarkdownContent'
 import { DownloadButton } from '../../components/DownloadButton'
+import { FavoriteButton } from '../../components/FavoriteButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -64,6 +65,7 @@ export default async function DocPage({ params }: PageProps) {
           </a>
         )}
         <DownloadButton content={doc.content || ''} filename={doc.slug} title={doc.title} />
+        <FavoriteButton type="docs" id={doc.id} />
       </div>
 
       <div className="doc-content">

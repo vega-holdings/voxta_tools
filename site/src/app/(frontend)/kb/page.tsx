@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 
@@ -10,7 +11,24 @@ export const metadata = {
   description: 'Browse all Voxta knowledge base articles',
 }
 
+interface UserCookie {
+  isGuildMember?: boolean
+}
+
 export default async function KBListPage() {
+  // Check if user is logged in and is a guild member
+  const cookieStore = await cookies()
+  const userCookie = cookieStore.get('discord_user')
+  let isGuildMember = false
+
+  if (userCookie) {
+    try {
+      const user = JSON.parse(userCookie.value) as UserCookie
+      isGuildMember = user.isGuildMember || false
+    } catch {
+      // Invalid cookie
+    }
+  }
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
@@ -32,7 +50,14 @@ export default async function KBListPage() {
 
   return (
     <div className="kb-list-page">
-      <h1>Knowledge Base</h1>
+      <div className="kb-header-row">
+        <h1>Knowledge Base</h1>
+        {isGuildMember && (
+          <Link href="/kb/new" className="new-article-btn">
+            + New Article
+          </Link>
+        )}
+      </div>
 
       {categories.map((category) => (
         <section key={category} style={{ marginBottom: '2rem' }}>
