@@ -82,5 +82,17 @@ export const DiscordUsers: CollectionConfig = {
         description: 'Has admin privileges',
       },
     },
+    {
+      name: 'displayPreference',
+      type: 'select',
+      defaultValue: 'username',
+      options: [
+        { label: 'Username', value: 'username' },
+        { label: 'Display Name', value: 'displayName' },
+      ],
+      admin: {
+        description: 'How your name appears on contributions and edits',
+      },
+    },
   ],
 }

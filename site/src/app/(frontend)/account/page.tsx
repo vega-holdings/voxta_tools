@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
+import { SettingsForm } from './SettingsForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -122,6 +123,7 @@ export default async function AccountPage() {
 
   const editCount = dbUser?.editCount || 0
   const isAdmin = (dbUser as { isAdmin?: boolean } | null)?.isAdmin || false
+  const displayPreference = (dbUser as { displayPreference?: string } | null)?.displayPreference || 'username'
 
   return (
     <div className="account-page">
@@ -221,6 +223,12 @@ export default async function AccountPage() {
         )}
       </div>
 
+
+      <SettingsForm
+        currentPreference={displayPreference}
+        username={user.username}
+        displayName={user.displayName}
+      />
 
       <div className="account-actions">
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}

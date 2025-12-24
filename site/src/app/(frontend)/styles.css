@@ -1247,6 +1247,46 @@ main {
   margin: 0;
 }
 
+.setting-row {
+  margin-bottom: 1rem;
+}
+
+.setting-options {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.setting-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  background: var(--bg-hover);
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.setting-option:hover {
+  background: var(--bg-card);
+}
+
+.setting-option input[type="radio"] {
+  cursor: pointer;
+}
+
+.setting-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.setting-message {
+  color: var(--success);
+  font-size: 0.875rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .site-header {

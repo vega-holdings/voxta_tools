@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
   }
 
-  let user: { id: number; discordId: string; displayName: string }
+  let user: { id: number; discordId: string; username: string; displayName: string }
   try {
     user = JSON.parse(userCookie.value)
   } catch {
@@ -69,11 +69,15 @@ export async function POST(request: NextRequest) {
 
     const now = new Date().toISOString()
 
+    // Get user's display preference (default to username for consistency with contributor field)
+    const displayPref = (discordUser as { displayPreference?: string } | null)?.displayPreference || 'username'
+    const editorName = displayPref === 'displayName' ? user.displayName : user.username
+
     // Build update data
     const updateData: Record<string, unknown> = {
       title,
       content,
-      lastEditedByName: user.displayName,
+      lastEditedByName: editorName,
       lastEditedByDiscordId: user.discordId,
       lastEditedAt: now,
     }
