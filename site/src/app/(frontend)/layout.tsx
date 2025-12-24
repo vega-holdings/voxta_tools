@@ -21,6 +21,8 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             <HeaderSearch />
             <div className="nav-links">
               <Link href="/docs">Docs</Link>
+              <Link href="/docs/developers">Developers</Link>
+              <Link href="/docs/creators">Creators</Link>
               <Link href="/kb">KB</Link>
               <Link href="/leaderboard">Leaderboard</Link>
               <a href="https://voxta.ai" target="_blank" rel="noopener noreferrer">Official Site</a>

@@ -1,11 +1,14 @@
 import React from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { MarkdownContent } from '@/components/MarkdownContent'
 import { DownloadButton } from '../../components/DownloadButton'
 import { FavoriteButton } from '../../components/FavoriteButton'
+import { EditButton } from './EditButton'
+import { VersionHistory } from '../../components/VersionHistory'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,8 +48,29 @@ export default async function DocPage({ params }: PageProps) {
     depth: 1,
   })
 
-  const doc = result.docs[0]
-  if (!doc) notFound()
+  const rawDoc = result.docs[0]
+  if (!rawDoc) notFound()
+
+  // Cast to include edit tracking fields that may not be in generated types
+  const doc = rawDoc as typeof rawDoc & { lastEditedAt?: string; lastEditedByName?: string }
+
+  // Check if user is logged in and is a guild member
+  const cookieStore = await cookies()
+  const userCookie = cookieStore.get('discord_user')
+  const isLoggedIn = !!userCookie
+  let isGuildMember = false
+
+  if (userCookie) {
+    try {
+      const user = JSON.parse(userCookie.value) as { isGuildMember?: boolean }
+      isGuildMember = user.isGuildMember || false
+    } catch {
+      // Invalid cookie
+    }
+  }
+
+  // Format last edited date
+  const lastEditedAt = doc.lastEditedAt ? new Date(doc.lastEditedAt).toLocaleDateString() : null
 
   // Get related KB articles if any
   const relatedKB = doc.relatedKB as Array<{ id: number; title: string; slug: string }> | undefined
@@ -55,7 +79,20 @@ export default async function DocPage({ params }: PageProps) {
     <div className="doc-page">
       <Link href="/docs" className="back-link">&larr; Back to Docs</Link>
 
-      <h1>{doc.title}</h1>
+      <div className="doc-header">
+        <div>
+          <h1>{doc.title}</h1>
+          {lastEditedAt && doc.lastEditedByName && (
+            <p className="last-edited">
+              Last edited by {doc.lastEditedByName} on {lastEditedAt}
+            </p>
+          )}
+        </div>
+        <div className="doc-actions">
+          <FavoriteButton type="docs" id={doc.id} />
+          {isLoggedIn && <EditButton slug={doc.slug} />}
+        </div>
+      </div>
 
       <div className="doc-meta">
         {doc.category && <span>{doc.category}</span>}
@@ -65,7 +102,6 @@ export default async function DocPage({ params }: PageProps) {
           </a>
         )}
         <DownloadButton content={doc.content || ''} filename={doc.slug} title={doc.title} />
-        <FavoriteButton type="docs" id={doc.id} />
       </div>
 
       <div className="doc-content">
@@ -83,6 +119,10 @@ export default async function DocPage({ params }: PageProps) {
             ))}
           </ul>
         </div>
+      )}
+
+      {isGuildMember && (
+        <VersionHistory type="docs" id={doc.id} />
       )}
     </div>
   )

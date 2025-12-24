@@ -7,6 +7,7 @@ import { MarkdownContent } from '@/components/MarkdownContent'
 import { cookies } from 'next/headers'
 import { EditButton } from './EditButton'
 import { FavoriteButton } from '../../components/FavoriteButton'
+import { VersionHistory } from '../../components/VersionHistory'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,10 +49,20 @@ export default async function KBArticlePage({ params }: PageProps) {
   const article = result.docs[0]
   if (!article) notFound()
 
-  // Check if user is logged in
+  // Check if user is logged in and is a guild member
   const cookieStore = await cookies()
   const userCookie = cookieStore.get('discord_user')
   const isLoggedIn = !!userCookie
+  let isGuildMember = false
+
+  if (userCookie) {
+    try {
+      const user = JSON.parse(userCookie.value) as { isGuildMember?: boolean }
+      isGuildMember = user.isGuildMember || false
+    } catch {
+      // Invalid cookie
+    }
+  }
 
   // Parse topics and keywords
   const topics = article.topics as Array<{ topic: string }> | undefined
@@ -118,6 +129,10 @@ export default async function KBArticlePage({ params }: PageProps) {
             {keywords.map(k => k.keyword).join(', ')}
           </span>
         </div>
+      )}
+
+      {isGuildMember && (
+        <VersionHistory type="kb" id={article.id} />
       )}
     </div>
   )

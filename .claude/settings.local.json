@@ -130,7 +130,18 @@
       "Bash(wc:*)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=migrate-phase1.sql)",
       "Bash(git reset:*)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "Bash(npx wrangler:*)",
+      "Bash(gh secret set:*)",
+      "Bash(gh secret list:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run:*)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 PAYLOAD_SECRET=e7d9f2e15952e5220b4acdbca31a4f98052467f53dd603697d1578acf2155e15 pnpm deploy)",
+      "Bash(set CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3)",
+      "Bash(set PAYLOAD_SECRET=e7d9f2e15952e5220b4acdbca31a4f98052467f53dd603697d1578acf2155e15:*)",
+      "Bash(npx opennextjs-cloudflare build:*)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"CREATE TABLE IF NOT EXISTS discord_users_rels \\(id INTEGER PRIMARY KEY AUTOINCREMENT, parent_id INTEGER NOT NULL REFERENCES discord_users\\(id\\) ON DELETE CASCADE, path TEXT NOT NULL, kb_articles_id INTEGER REFERENCES kb_articles\\(id\\) ON DELETE CASCADE, docs_pages_id INTEGER REFERENCES docs_pages\\(id\\) ON DELETE CASCADE, \"\"order\"\" INTEGER\\);\")",
+      "Bash(find:*)"
     ]
   }
 }

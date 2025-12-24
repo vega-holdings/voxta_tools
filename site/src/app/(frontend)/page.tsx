@@ -34,8 +34,10 @@ export default async function HomePage() {
         <SearchForm />
         <div className="quick-links">
           <Link href="/docs">Documentation</Link>
+          <Link href="/docs/developers">Developers</Link>
+          <Link href="/docs/creators">Creators</Link>
           <Link href="/kb">Knowledge Base</Link>
-          <Link href="/leaderboard">Top Contributors</Link>
+          <Link href="/leaderboard">Leaderboard</Link>
         </div>
       </section>
 

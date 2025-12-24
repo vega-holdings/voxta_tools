@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 
@@ -10,14 +11,17 @@ export const metadata = {
   description: 'Browse all Voxta documentation pages',
 }
 
+interface UserCookie {
+  isGuildMember?: boolean
+}
+
 // Ordered list of categories with display labels
+// Main docs page shows only these core categories (not developers/creators)
 const categoryOrder = [
   { value: 'documentation', label: 'Documentation' },
   { value: 'installing', label: 'Installing' },
   { value: 'interface', label: 'Interface' },
   { value: 'modules', label: 'Modules' },
-  { value: 'developers', label: 'Developers' },
-  { value: 'creators', label: 'Creators' },
 ]
 
 const categoryLabels: Record<string, string> = Object.fromEntries(
@@ -25,6 +29,20 @@ const categoryLabels: Record<string, string> = Object.fromEntries(
 )
 
 export default async function DocsListPage() {
+  // Check if user is logged in and is a guild member
+  const cookieStore = await cookies()
+  const userCookie = cookieStore.get('discord_user')
+  let isGuildMember = false
+
+  if (userCookie) {
+    try {
+      const user = JSON.parse(userCookie.value) as UserCookie
+      isGuildMember = user.isGuildMember || false
+    } catch {
+      // Invalid cookie
+    }
+  }
+
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
@@ -64,7 +82,14 @@ export default async function DocsListPage() {
 
   return (
     <div className="docs-list-page">
-      <h1>Documentation</h1>
+      <div className="docs-header-row">
+        <h1>Documentation</h1>
+        {isGuildMember && (
+          <Link href="/docs/new" className="new-article-btn">
+            + New Doc
+          </Link>
+        )}
+      </div>
 
       {[...orderedCategories, ...otherCategories].map((category) => (
         <section key={category} style={{ marginBottom: '2rem' }}>
