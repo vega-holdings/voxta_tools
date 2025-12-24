@@ -113,7 +113,24 @@
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put NEXT_PUBLIC_APP_URL --name voxta-unoffical-docs)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"ALTER TABLE discord_users ADD COLUMN is_admin INTEGER DEFAULT 0;\")",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"UPDATE discord_users SET is_admin = 1 WHERE discord_id = ''388908766306893854'';\")",
-      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"SELECT id, discord_id, username, display_name, is_admin FROM discord_users WHERE discord_id = ''388908766306893854'';\")"
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"SELECT id, discord_id, username, display_name, is_admin FROM discord_users WHERE discord_id = ''388908766306893854'';\")",
+      "Bash(node check-db.cjs:*)",
+      "Bash(sqlite3:*)",
+      "Bash(python:*)",
+      "Bash(node import-contributor-mappings.cjs:*)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=import-contributor-mappings.sql)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"SELECT name FROM sqlite_master WHERE type=''table'' AND name LIKE ''%contributor%'';\")",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"SELECT name FROM sqlite_master WHERE type=''table'';\")",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=create-claim-table.sql)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=fix-locked-docs.sql)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=check-mapping.sql --json)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=add-user-claim.sql)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=check-user.sql)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=fix-claim.sql)",
+      "Bash(wc:*)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=migrate-phase1.sql)",
+      "Bash(git reset:*)",
+      "Bash(gh auth:*)"
     ]
   }
 }

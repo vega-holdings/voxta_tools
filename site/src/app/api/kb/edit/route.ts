@@ -8,12 +8,6 @@ interface EditRequest {
   content: string
 }
 
-interface EditHistoryEntry {
-  editor?: number | null
-  editorName?: string | null
-  editedAt?: string | null
-}
-
 export async function POST(request: NextRequest) {
   // Get current user from cookie
   const userCookie = request.cookies.get('discord_user')

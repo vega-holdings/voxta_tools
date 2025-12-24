@@ -3,7 +3,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
-import { cookies } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 

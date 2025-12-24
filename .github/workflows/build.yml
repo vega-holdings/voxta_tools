@@ -50,4 +50,6 @@ jobs:
         working-directory: site
         env:
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           NEXT_PUBLIC_APP_URL: https://voxta.axailotl.ai
