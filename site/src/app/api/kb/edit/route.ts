@@ -69,35 +69,13 @@ export async function POST(request: NextRequest) {
 
     const now = new Date().toISOString()
 
-    // Format existing history entries properly
-    const currentHistory = (article.editHistory || []) as EditHistoryEntry[]
-    const formattedHistory = currentHistory.map(entry => ({
-      editorName: entry.editorName || null,
-      editedAt: entry.editedAt || null,
-      ...(entry.editor ? { editor: entry.editor } : {}),
-    }))
-
-    // Build new history entry
-    const newHistoryEntry: Record<string, unknown> = {
-      editorName: user.displayName,
-      editedAt: now,
-    }
-    if (discordUser) {
-      newHistoryEntry.editor = user.id
-    }
-
-    // Build update data - only include fields we're changing
+    // Build update data - just title, content, and text fields first
+    // Skip relationship and array fields to isolate the issue
     const updateData: Record<string, unknown> = {
       title,
       content,
       lastEditedByName: user.displayName,
       lastEditedAt: now,
-      editHistory: [...formattedHistory, newHistoryEntry],
-    }
-
-    // Only set relationship if user exists in DB
-    if (discordUser) {
-      updateData.lastEditedBy = user.id
     }
 
     console.log('Updating article:', articleId, 'with data keys:', Object.keys(updateData))
