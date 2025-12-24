@@ -2,10 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 
+interface AttachmentInput {
+  file: number
+  label?: string
+}
+
 interface EditRequest {
   docId: number
   title: string
   content: string
+  attachments?: AttachmentInput[]
 }
 
 export async function POST(request: NextRequest) {
@@ -31,7 +37,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json() as EditRequest
-  const { docId, title, content } = body
+  const { docId, title, content, attachments } = body
 
   if (!docId || !title || !content) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -82,6 +88,11 @@ export async function POST(request: NextRequest) {
       lastEditedByName: editorName,
       lastEditedByDiscordId: user.discordId,
       lastEditedAt: now,
+    }
+
+    // Add attachments if provided
+    if (attachments !== undefined) {
+      updateData.attachments = attachments
     }
 
     console.log('Updating doc:', docId, 'with data keys:', Object.keys(updateData))

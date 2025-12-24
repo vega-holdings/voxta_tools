@@ -36,9 +36,16 @@ export default async function EditDocPage({ params }: PageProps) {
     collection: 'docs-pages',
     where: { slug: { equals: slug } },
     limit: 1,
+    depth: 2,
   })
 
-  const doc = result.docs[0]
+  const doc = result.docs[0] as typeof result.docs[0] & {
+    attachments?: Array<{
+      id?: string
+      file: number | { id: number; filename: string; url: string }
+      label?: string
+    }>
+  }
   if (!doc) notFound()
 
   return (
@@ -52,6 +59,7 @@ export default async function EditDocPage({ params }: PageProps) {
         slug={slug}
         initialTitle={doc.title}
         initialContent={doc.content || ''}
+        initialAttachments={doc.attachments}
       />
     </div>
   )

@@ -10,15 +10,41 @@ export default async function HomePage() {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
-  // Get recent docs and KB articles for the homepage
+  // Get recent docs (excluding developers/creators categories)
   const recentDocs = await payload.find({
     collection: 'docs-pages',
+    where: {
+      category: {
+        not_in: ['developers', 'creators'],
+      },
+    },
     limit: 6,
     sort: '-updatedAt',
   })
 
+  // Get recent KB articles
   const recentKB = await payload.find({
     collection: 'kb-articles',
+    limit: 6,
+    sort: '-updatedAt',
+  })
+
+  // Get developer docs
+  const developerDocs = await payload.find({
+    collection: 'docs-pages',
+    where: {
+      category: { equals: 'developers' },
+    },
+    limit: 6,
+    sort: '-updatedAt',
+  })
+
+  // Get creator docs
+  const creatorDocs = await payload.find({
+    collection: 'docs-pages',
+    where: {
+      category: { equals: 'creators' },
+    },
     limit: 6,
     sort: '-updatedAt',
   })
@@ -43,7 +69,7 @@ export default async function HomePage() {
 
       <section className="content-grid">
         <div className="section">
-          <h2>Documentation</h2>
+          <Link href="/docs" className="section-title-link"><h2>Documentation</h2></Link>
           <p className="section-desc">Official guides and references</p>
           <ul className="item-list">
             {recentDocs.docs.map((doc) => (
@@ -55,11 +81,10 @@ export default async function HomePage() {
               </li>
             ))}
           </ul>
-          <Link href="/docs" className="view-all">View all docs</Link>
         </div>
 
         <div className="section">
-          <h2>Knowledge Base</h2>
+          <Link href="/kb" className="section-title-link"><h2>Knowledge Base</h2></Link>
           <p className="section-desc">Community Q&A and troubleshooting</p>
           <ul className="item-list">
             {recentKB.docs.map((article) => (
@@ -71,7 +96,44 @@ export default async function HomePage() {
               </li>
             ))}
           </ul>
-          <Link href="/kb" className="view-all">View all KB articles</Link>
+        </div>
+      </section>
+
+      <section className="content-grid">
+        <div className="section">
+          <Link href="/docs/developers" className="section-title-link"><h2>Developers</h2></Link>
+          <p className="section-desc">SDK guides and API documentation</p>
+          <ul className="item-list">
+            {developerDocs.docs.length > 0 ? (
+              developerDocs.docs.map((doc) => (
+                <li key={doc.id}>
+                  <Link href={`/docs/${doc.slug}`}>
+                    <span className="item-title">{doc.title}</span>
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <li className="empty-state">No developer docs yet</li>
+            )}
+          </ul>
+        </div>
+
+        <div className="section">
+          <Link href="/docs/creators" className="section-title-link"><h2>Creators</h2></Link>
+          <p className="section-desc">Character and scenario creation</p>
+          <ul className="item-list">
+            {creatorDocs.docs.length > 0 ? (
+              creatorDocs.docs.map((doc) => (
+                <li key={doc.id}>
+                  <Link href={`/docs/${doc.slug}`}>
+                    <span className="item-title">{doc.title}</span>
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <li className="empty-state">No creator docs yet</li>
+            )}
+          </ul>
         </div>
       </section>
     </div>

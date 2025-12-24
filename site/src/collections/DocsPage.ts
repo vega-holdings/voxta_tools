@@ -126,5 +126,27 @@ export const DocsPage: CollectionConfig = {
         description: 'When the page was last edited',
       },
     },
+    {
+      name: 'attachments',
+      type: 'array',
+      admin: {
+        description: 'File attachments (JSON, JS, MD templates/snippets)',
+      },
+      fields: [
+        {
+          name: 'file',
+          type: 'upload',
+          relationTo: 'media',
+          required: true,
+        },
+        {
+          name: 'label',
+          type: 'text',
+          admin: {
+            description: 'Display name for download link',
+          },
+        },
+      ],
+    },
   ],
 }

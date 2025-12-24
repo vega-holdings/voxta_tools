@@ -44,10 +44,20 @@ export default async function KBArticlePage({ params }: PageProps) {
     collection: 'kb-articles',
     where: { slug: { equals: slug } },
     limit: 1,
+    depth: 2,
   })
 
-  const article = result.docs[0]
-  if (!article) notFound()
+  const rawArticle = result.docs[0]
+  if (!rawArticle) notFound()
+
+  // Cast to include attachments field that may not be in generated types
+  const article = rawArticle as typeof rawArticle & {
+    attachments?: Array<{
+      id?: string
+      file: number | { id: number; filename: string; url: string }
+      label?: string
+    }>
+  }
 
   // Check if user is logged in and is a guild member
   const cookieStore = await cookies()
@@ -128,6 +138,25 @@ export default async function KBArticlePage({ params }: PageProps) {
           <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
             {keywords.map(k => k.keyword).join(', ')}
           </span>
+        </div>
+      )}
+
+      {article.attachments && article.attachments.length > 0 && (
+        <div className="attachments">
+          <h3>Attachments</h3>
+          <ul>
+            {article.attachments.map((att, index) => {
+              const file = typeof att.file === 'object' ? att.file : null
+              if (!file) return null
+              return (
+                <li key={att.id || index}>
+                  <a href={file.url} download={file.filename}>
+                    {att.label || file.filename}
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
         </div>
       )}
 

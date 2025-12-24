@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 
+interface AttachmentInput {
+  file: number
+  label?: string
+}
+
 interface CreateRequest {
   title: string
   content: string
   category?: string
   type?: string
+  attachments?: AttachmentInput[]
 }
 
 interface UserCookie {
@@ -41,7 +47,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json() as CreateRequest
-  const { title, content, category, type } = body
+  const { title, content, category, type, attachments } = body
 
   if (!title || !content) {
     return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
@@ -87,7 +93,7 @@ export async function POST(request: NextRequest) {
     const now = new Date().toISOString()
 
     // Create the article - cast to bypass type checking for new fields
-    const articleData = {
+    const articleData: Record<string, unknown> = {
       title,
       slug,
       content,
@@ -98,6 +104,11 @@ export async function POST(request: NextRequest) {
       lastEditedByName: editorName,
       lastEditedByDiscordId: user.discordId,
       lastEditedAt: now,
+    }
+
+    // Add attachments if provided
+    if (attachments && attachments.length > 0) {
+      articleData.attachments = attachments
     }
 
     const article = await payload.create({

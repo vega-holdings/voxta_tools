@@ -1,7 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+
+interface UploadedFile {
+  id: number
+  filename: string
+  url: string
+  label: string
+}
 
 const categories = [
   { label: 'Configuration', value: 'configuration' },
@@ -27,12 +34,62 @@ const types = [
 
 export function NewArticleForm() {
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [category, setCategory] = useState('configuration')
   const [type, setType] = useState('qa')
+  const [attachments, setAttachments] = useState<UploadedFile[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setIsUploading(true)
+    setError(null)
+
+    try {
+      for (const file of Array.from(files)) {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+
+        const data = await res.json() as { error?: string; media?: { id: number; filename: string; url: string } }
+
+        if (!res.ok) {
+          setError(data.error || 'Upload failed')
+          continue
+        }
+
+        if (data.media) {
+          setAttachments(prev => [...prev, {
+            id: data.media!.id,
+            filename: data.media!.filename,
+            url: data.media!.url,
+            label: file.name,
+          }])
+        }
+      }
+    } catch {
+      setError('Upload failed')
+    } finally {
+      setIsUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  const removeAttachment = (id: number) => {
+    setAttachments(prev => prev.filter(a => a.id !== id))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,7 +100,13 @@ export function NewArticleForm() {
       const res = await fetch('/api/kb/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content, category, type }),
+        body: JSON.stringify({
+          title,
+          content,
+          category,
+          type,
+          attachments: attachments.map(a => ({ file: a.id, label: a.label })),
+        }),
       })
 
       const data = await res.json() as { error?: string; slug?: string }
@@ -117,8 +180,39 @@ export function NewArticleForm() {
         />
       </div>
 
+      <div className="form-group">
+        <label>Attachments (JSON, JS, MD files)</label>
+        <div className="file-upload-area">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,.js,.md,.txt"
+            multiple
+            onChange={handleFileUpload}
+            disabled={isUploading}
+          />
+          {isUploading && <span className="uploading-text">Uploading...</span>}
+        </div>
+        {attachments.length > 0 && (
+          <ul className="attachment-list">
+            {attachments.map(att => (
+              <li key={att.id} className="attachment-item">
+                <span>{att.label}</span>
+                <button
+                  type="button"
+                  onClick={() => removeAttachment(att.id)}
+                  className="remove-attachment"
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className="form-actions">
-        <button type="submit" disabled={isSubmitting} className="save-button">
+        <button type="submit" disabled={isSubmitting || isUploading} className="save-button">
           {isSubmitting ? 'Creating...' : 'Create Article'}
         </button>
         <button

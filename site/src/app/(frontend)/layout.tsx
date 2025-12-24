@@ -7,6 +7,9 @@ import './styles.css'
 export const metadata = {
   title: 'Voxta Unofficial Documentation',
   description: 'Unofficial community documentation for Voxta AI conversation platform with semantic search.',
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default async function RootLayout(props: { children: React.ReactNode }) {

@@ -36,9 +36,16 @@ export default async function EditKBPage({ params }: PageProps) {
     collection: 'kb-articles',
     where: { slug: { equals: slug } },
     limit: 1,
+    depth: 2,
   })
 
-  const article = result.docs[0]
+  const article = result.docs[0] as typeof result.docs[0] & {
+    attachments?: Array<{
+      id?: string
+      file: number | { id: number; filename: string; url: string }
+      label?: string
+    }>
+  }
   if (!article) notFound()
 
   return (
@@ -52,6 +59,7 @@ export default async function EditKBPage({ params }: PageProps) {
         slug={slug}
         initialTitle={article.title}
         initialContent={article.content || ''}
+        initialAttachments={article.attachments}
       />
     </div>
   )

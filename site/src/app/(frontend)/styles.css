@@ -1,7 +1,8 @@
 :root {
   --font-mono: 'Roboto Mono', monospace;
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
+  --primary: #a855f7;
+  --primary-dark: #9333ea;
+  --accent: #e11d48;
   --bg: #0a0a0a;
   --bg-card: #141414;
   --bg-hover: #1f1f1f;
@@ -439,6 +440,29 @@ main {
 .content-grid .section h2 {
   margin: 0 0 0.25rem;
   font-size: 1.25rem;
+}
+
+.section-title-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.section-title-link:hover {
+  text-decoration: none;
+}
+
+.section-title-link h2 {
+  color: var(--text);
+  transition: color 0.2s;
+}
+
+.section-title-link:hover h2 {
+  color: var(--primary);
+}
+
+.empty-state {
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .content-grid .section-desc {
@@ -962,6 +986,113 @@ main {
 .form-actions {
   display: flex;
   gap: 1rem;
+}
+
+/* File Upload */
+.file-upload-area {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.file-upload-area input[type="file"] {
+  padding: 0.5rem;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.file-upload-area input[type="file"]:hover {
+  border-color: var(--primary);
+}
+
+.uploading-text {
+  color: var(--primary);
+  font-size: 0.875rem;
+}
+
+.attachment-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.attachment-item span {
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.remove-attachment {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.remove-attachment:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* Attachments display on pages */
+.attachments {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.attachments h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.attachments ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.attachments li a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--primary);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.attachments li a:hover {
+  border-color: var(--primary);
+  text-decoration: none;
 }
 
 .save-button {

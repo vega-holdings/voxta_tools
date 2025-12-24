@@ -45,14 +45,22 @@ export default async function DocPage({ params }: PageProps) {
     collection: 'docs-pages',
     where: { slug: { equals: slug } },
     limit: 1,
-    depth: 1,
+    depth: 2,
   })
 
   const rawDoc = result.docs[0]
   if (!rawDoc) notFound()
 
-  // Cast to include edit tracking fields that may not be in generated types
-  const doc = rawDoc as typeof rawDoc & { lastEditedAt?: string; lastEditedByName?: string }
+  // Cast to include edit tracking fields and attachments that may not be in generated types
+  const doc = rawDoc as typeof rawDoc & {
+    lastEditedAt?: string
+    lastEditedByName?: string
+    attachments?: Array<{
+      id?: string
+      file: number | { id: number; filename: string; url: string }
+      label?: string
+    }>
+  }
 
   // Check if user is logged in and is a guild member
   const cookieStore = await cookies()
@@ -117,6 +125,25 @@ export default async function DocPage({ params }: PageProps) {
                 <Link href={`/kb/${kb.slug}`}>{kb.title}</Link>
               </li>
             ))}
+          </ul>
+        </div>
+      )}
+
+      {doc.attachments && doc.attachments.length > 0 && (
+        <div className="attachments">
+          <h3>Attachments</h3>
+          <ul>
+            {doc.attachments.map((att, index) => {
+              const file = typeof att.file === 'object' ? att.file : null
+              if (!file) return null
+              return (
+                <li key={att.id || index}>
+                  <a href={file.url} download={file.filename}>
+                    {att.label || file.filename}
+                  </a>
+                </li>
+              )
+            })}
           </ul>
         </div>
       )}
