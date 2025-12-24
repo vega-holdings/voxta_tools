@@ -52,6 +52,42 @@ export default async function AccountPage() {
     // User not in DB yet
   }
 
+  // Auto-claim contributor name if not already done (fallback for users who logged in before auto-claim was deployed)
+  if (dbUser && user.discordId) {
+    const currentClaims = (dbUser.claimedContributorNames as Array<{ name: string }>) || []
+    if (currentClaims.length === 0) {
+      try {
+        // Check contributor_mappings via direct query through payload's db
+        const { env } = await (await import('@opennextjs/cloudflare')).getCloudflareContext()
+        const mapping = await env.D1.prepare(
+          'SELECT username FROM contributor_mappings WHERE discord_id = ?'
+        ).bind(user.discordId).first<{ username: string }>()
+
+        if (mapping) {
+          // Check if this name is already claimed by anyone
+          const existingClaim = await env.D1.prepare(
+            'SELECT id FROM discord_users_claimed_contributor_names WHERE name = ?'
+          ).bind(mapping.username).first()
+
+          if (!existingClaim) {
+            // Add the claim
+            await env.D1.prepare(
+              'INSERT INTO discord_users_claimed_contributor_names (_order, _parent_id, id, name) VALUES (0, ?, ?, ?)'
+            ).bind(user.id, crypto.randomUUID(), mapping.username).run()
+
+            // Refresh dbUser to get updated claims
+            dbUser = await payload.findByID({
+              collection: 'discord-users',
+              id: user.id,
+            })
+          }
+        }
+      } catch (e) {
+        console.error('[Account] Auto-claim fallback error:', e)
+      }
+    }
+  }
+
   // Get articles where user is the original contributor (by claimed names)
   const claimedNames = (dbUser?.claimedContributorNames as Array<{ name: string }>) || []
   const contributorNames = claimedNames.map(c => c.name)
@@ -109,8 +145,7 @@ export default async function AccountPage() {
 
         <div className="account-info">
           <h1>{user.displayName}</h1>
-          <p className="account-username">@{user.username}</p>
-          <p className="account-discord-id">Discord ID: <code>{user.discordId}</code></p>
+          <p className="account-discord-id"><code>{user.discordId}</code></p>
           {isAdmin && <span className="admin-badge">Admin</span>}
         </div>
       </div>
@@ -187,26 +222,6 @@ export default async function AccountPage() {
         )}
       </div>
 
-      <div className="account-section">
-        <h2>Settings</h2>
-        <div className="settings-grid">
-          <div className="setting-item">
-            <span className="setting-label">Display Name</span>
-            <span className="setting-value">{user.displayName}</span>
-          </div>
-          <div className="setting-item">
-            <span className="setting-label">Username</span>
-            <span className="setting-value">@{user.username}</span>
-          </div>
-          <div className="setting-item">
-            <span className="setting-label">Discord ID</span>
-            <span className="setting-value"><code>{user.discordId}</code></span>
-          </div>
-        </div>
-        <p className="settings-note">
-          Profile info syncs from Discord on each login.
-        </p>
-      </div>
 
       <div className="account-actions">
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
