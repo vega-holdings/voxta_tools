@@ -2,6 +2,14 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
   "name": "voxta-unoffical-docs",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  },
   "compatibility_date": "2025-08-15",
   "compatibility_flags": [
     "nodejs_compat",
