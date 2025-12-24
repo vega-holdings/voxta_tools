@@ -101,6 +101,40 @@ export async function GET(request: NextRequest) {
       userId = result.meta.last_row_id as number
     }
 
+    // Auto-associate contributor name from scraper data
+    try {
+      // Check if this Discord user has a contributor mapping from the scraper
+      const mapping = await db.prepare(
+        'SELECT username, display_name FROM contributor_mappings WHERE discord_id = ?'
+      ).bind(discordUser.id).first<{ username: string; display_name: string }>()
+
+      if (mapping) {
+        // Check if this contributor name is already claimed by anyone
+        const alreadyClaimed = await db.prepare(
+          'SELECT id FROM discord_users_claimed_contributor_names WHERE name = ?'
+        ).bind(mapping.username).first()
+
+        if (!alreadyClaimed) {
+          // Get the max order for this user's claims
+          const maxOrder = await db.prepare(
+            'SELECT MAX(_order) as max_order FROM discord_users_claimed_contributor_names WHERE _parent_id = ?'
+          ).bind(userId).first<{ max_order: number | null }>()
+
+          const nextOrder = (maxOrder?.max_order ?? -1) + 1
+
+          // Auto-claim the contributor name
+          await db.prepare(
+            'INSERT INTO discord_users_claimed_contributor_names (_order, _parent_id, id, name) VALUES (?, ?, ?, ?)'
+          ).bind(nextOrder, userId, crypto.randomUUID(), mapping.username).run()
+
+          console.log(`[Auth] Auto-claimed contributor name '${mapping.username}' for user ${discordUser.id}`)
+        }
+      }
+    } catch (e) {
+      // Non-fatal, continue with login
+      console.error('[Auth] Auto-claim error:', e)
+    }
+
     // Create session cookie
     const response = NextResponse.redirect(new URL('/leaderboard?login=success', request.url))
 

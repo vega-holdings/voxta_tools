@@ -3,7 +3,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
-import { ClaimButton } from './ClaimButton'
 import { cookies } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
@@ -68,18 +67,6 @@ export default async function ContributorPage({ params }: PageProps) {
     // Query failed, continue without claim info
   }
 
-  // Get current user from cookie
-  const cookieStore = await cookies()
-  const userCookie = cookieStore.get('discord_user')
-  let currentUser: { id: number; displayName: string } | null = null
-  if (userCookie) {
-    try {
-      currentUser = JSON.parse(userCookie.value)
-    } catch {
-      // Invalid cookie
-    }
-  }
-
   // Group articles by category
   const byCategory = new Map<string, typeof articles.docs>()
   for (const article of articles.docs) {
@@ -89,8 +76,6 @@ export default async function ContributorPage({ params }: PageProps) {
     }
     byCategory.get(cat)!.push(article)
   }
-
-  const canClaim = currentUser && !claimedBy
 
   return (
     <div className="contributor-page">
@@ -124,8 +109,10 @@ export default async function ContributorPage({ params }: PageProps) {
           </p>
         </div>
 
-        {canClaim && (
-          <ClaimButton contributorName={contributorName} />
+        {!claimedBy && (
+          <p className="auto-claim-note">
+            Discord users are auto-linked when they log in
+          </p>
         )}
       </div>
 
