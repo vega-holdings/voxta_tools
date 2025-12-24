@@ -8,6 +8,12 @@ interface EditRequest {
   content: string
 }
 
+interface EditHistoryEntry {
+  editor?: number | null
+  editorName?: string | null
+  editedAt?: string | null
+}
+
 export async function POST(request: NextRequest) {
   // Get current user from cookie
   const userCookie = request.cookies.get('discord_user')
@@ -33,38 +39,67 @@ export async function POST(request: NextRequest) {
     const payloadConfig = await config
     const payload = await getPayload({ config: payloadConfig })
 
-    const now = new Date().toISOString()
-
-    // Update article - only update simple fields, skip relationships
-    await payload.update({
-      collection: 'kb-articles',
-      id: articleId,
-      data: {
-        title,
-        content,
-        lastEditedByName: user.displayName,
-        lastEditedAt: now,
-      },
-    })
-
-    // Increment user's edit count
+    // Verify the discord user exists
+    let discordUser = null
     try {
-      const discordUser = await payload.findByID({
+      discordUser = await payload.findByID({
         collection: 'discord-users',
         id: user.id,
       })
-
-      if (discordUser) {
-        await payload.update({
-          collection: 'discord-users',
-          id: user.id,
-          data: {
-            editCount: (discordUser.editCount || 0) + 1,
-          },
-        })
-      }
     } catch {
-      // User update failed, but article was saved
+      // User not found in DB
+    }
+
+    // Get current article
+    const article = await payload.findByID({
+      collection: 'kb-articles',
+      id: articleId,
+    })
+
+    if (!article) {
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    }
+
+    const now = new Date().toISOString()
+    const currentHistory = (article.editHistory || []) as EditHistoryEntry[]
+
+    // Build update data with full relationship tracking
+    const updateData: Record<string, unknown> = {
+      title,
+      content,
+      lastEditedByName: user.displayName,
+      lastEditedAt: now,
+      editHistory: [
+        ...currentHistory,
+        {
+          editorName: user.displayName,
+          editedAt: now,
+          ...(discordUser ? { editor: user.id } : {}),
+        },
+      ],
+    }
+
+    // Only set relationship if user exists in DB
+    if (discordUser) {
+      updateData.lastEditedBy = user.id
+    }
+
+    // Update article
+    await payload.update({
+      collection: 'kb-articles',
+      id: articleId,
+      data: updateData,
+    })
+
+    // Increment user's edit count if user exists
+    if (discordUser) {
+      await payload.update({
+        collection: 'discord-users',
+        id: user.id,
+        data: {
+          editCount: (discordUser.editCount || 0) + 1,
+        },
+      })
     }
 
     return NextResponse.json({ success: true })
