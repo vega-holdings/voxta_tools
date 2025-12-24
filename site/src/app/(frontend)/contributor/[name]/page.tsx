@@ -45,21 +45,28 @@ export default async function ContributorPage({ params }: PageProps) {
   })
 
   // Check if this contributor name is claimed by anyone
-  const claimSearch = await payload.find({
-    collection: 'discord-users',
-    where: {
-      'claimedContributorNames.name': { equals: contributorName },
-    },
-    limit: 1,
-  })
+  // Fetch all discord users and check locally (array query not well supported)
+  let claimedBy: ClaimedByUser | null = null
+  try {
+    const allUsers = await payload.find({
+      collection: 'discord-users',
+      limit: 100,
+    })
 
-  const claimedBy: ClaimedByUser | null = claimSearch.docs.length > 0
-    ? {
-        id: claimSearch.docs[0].id,
-        displayName: claimSearch.docs[0].displayName,
-        avatar: claimSearch.docs[0].avatar || null,
+    for (const user of allUsers.docs) {
+      const claims = user.claimedContributorNames as Array<{ name: string }> | undefined
+      if (claims?.some(c => c.name === contributorName)) {
+        claimedBy = {
+          id: user.id,
+          displayName: user.displayName,
+          avatar: user.avatar || null,
+        }
+        break
       }
-    : null
+    }
+  } catch {
+    // Query failed, continue without claim info
+  }
 
   // Get current user from cookie
   const cookieStore = await cookies()

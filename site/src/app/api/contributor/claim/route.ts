@@ -30,21 +30,20 @@ export async function POST(request: NextRequest) {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
-  // Check if already claimed by someone
-  const existingClaims = await payload.find({
+  // Check if already claimed by someone (array query not well supported, check locally)
+  const allUsers = await payload.find({
     collection: 'discord-users',
-    where: {
-      'claimedContributorNames.name': { equals: contributorName },
-    },
-    limit: 1,
+    limit: 100,
   })
 
-  if (existingClaims.docs.length > 0) {
-    const claimant = existingClaims.docs[0]
-    if (claimant.id === user.id) {
-      return NextResponse.json({ error: 'You already claimed this name' }, { status: 400 })
+  for (const existingUser of allUsers.docs) {
+    const claims = existingUser.claimedContributorNames as Array<{ name: string }> | undefined
+    if (claims?.some(c => c.name === contributorName)) {
+      if (existingUser.id === user.id) {
+        return NextResponse.json({ error: 'You already claimed this name' }, { status: 400 })
+      }
+      return NextResponse.json({ error: `Already claimed by ${existingUser.displayName}` }, { status: 400 })
     }
-    return NextResponse.json({ error: `Already claimed by ${claimant.displayName}` }, { status: 400 })
   }
 
   // Get current user's claims
