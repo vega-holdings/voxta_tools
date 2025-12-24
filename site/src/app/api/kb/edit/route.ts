@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
+import { getCloudflareContext } from '@opennextjs/cloudflare'
 
 interface EditRequest {
   articleId: number
@@ -29,58 +28,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
+  try {
+    const { env } = await getCloudflareContext()
+    const db = env.D1
 
-  // Get current article to preserve edit history
-  const article = await payload.findByID({
-    collection: 'kb-articles',
-    id: articleId,
-  })
+    const now = new Date().toISOString()
 
-  if (!article) {
-    return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    // Update article directly in D1 (simpler, avoids hook issues)
+    await db.prepare(`
+      UPDATE kb_articles
+      SET title = ?, content = ?, last_edited_by_name = ?, last_edited_at = ?, updated_at = ?
+      WHERE id = ?
+    `).bind(title, content, user.displayName, now, now, articleId).run()
+
+    // Increment user's edit count
+    await db.prepare(`
+      UPDATE discord_users SET edit_count = edit_count + 1, updated_at = ? WHERE id = ?
+    `).bind(now, user.id).run()
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Edit error:', error)
+    return NextResponse.json({ error: 'Failed to save' }, { status: 500 })
   }
-
-  const now = new Date().toISOString()
-  const currentHistory = (article.editHistory || []) as Array<{ editor?: number; editorName?: string; editedAt?: string }>
-
-  // Update article with Payload
-  await payload.update({
-    collection: 'kb-articles',
-    id: articleId,
-    data: {
-      title,
-      content,
-      lastEditedBy: user.id,
-      lastEditedByName: user.displayName,
-      lastEditedAt: now,
-      editHistory: [
-        ...currentHistory,
-        {
-          editor: user.id,
-          editorName: user.displayName,
-          editedAt: now,
-        },
-      ],
-    },
-  })
-
-  // Increment user's edit count
-  const discordUser = await payload.findByID({
-    collection: 'discord-users',
-    id: user.id,
-  })
-
-  if (discordUser) {
-    await payload.update({
-      collection: 'discord-users',
-      id: user.id,
-      data: {
-        editCount: (discordUser.editCount || 0) + 1,
-      },
-    })
-  }
-
-  return NextResponse.json({ success: true })
 }
