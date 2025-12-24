@@ -11,6 +11,8 @@ export const KBArticle: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: () => true,
+    update: () => true,
   },
   hooks: {
     afterChange: [vectorizeAfterChange, githubSyncAfterChange],

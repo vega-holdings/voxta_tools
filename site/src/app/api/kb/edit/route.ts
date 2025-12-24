@@ -46,37 +46,53 @@ export async function POST(request: NextRequest) {
         collection: 'discord-users',
         id: user.id,
       })
-    } catch {
-      // User not found in DB
+    } catch (e) {
+      console.log('User lookup failed:', e)
+      // User not found in DB - continue without relationship
     }
 
     // Get current article
-    const article = await payload.findByID({
-      collection: 'kb-articles',
-      id: articleId,
-    })
+    let article
+    try {
+      article = await payload.findByID({
+        collection: 'kb-articles',
+        id: articleId,
+      })
+    } catch (e) {
+      console.error('Article lookup error:', e)
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    }
 
     if (!article) {
       return NextResponse.json({ error: 'Article not found' }, { status: 404 })
     }
 
     const now = new Date().toISOString()
-    const currentHistory = (article.editHistory || []) as EditHistoryEntry[]
 
-    // Build update data with full relationship tracking
+    // Format existing history entries properly
+    const currentHistory = (article.editHistory || []) as EditHistoryEntry[]
+    const formattedHistory = currentHistory.map(entry => ({
+      editorName: entry.editorName || null,
+      editedAt: entry.editedAt || null,
+      ...(entry.editor ? { editor: entry.editor } : {}),
+    }))
+
+    // Build new history entry
+    const newHistoryEntry: Record<string, unknown> = {
+      editorName: user.displayName,
+      editedAt: now,
+    }
+    if (discordUser) {
+      newHistoryEntry.editor = user.id
+    }
+
+    // Build update data - only include fields we're changing
     const updateData: Record<string, unknown> = {
       title,
       content,
       lastEditedByName: user.displayName,
       lastEditedAt: now,
-      editHistory: [
-        ...currentHistory,
-        {
-          editorName: user.displayName,
-          editedAt: now,
-          ...(discordUser ? { editor: user.id } : {}),
-        },
-      ],
+      editHistory: [...formattedHistory, newHistoryEntry],
     }
 
     // Only set relationship if user exists in DB
@@ -84,27 +100,40 @@ export async function POST(request: NextRequest) {
       updateData.lastEditedBy = user.id
     }
 
+    console.log('Updating article:', articleId, 'with data keys:', Object.keys(updateData))
+
     // Update article
-    await payload.update({
-      collection: 'kb-articles',
-      id: articleId,
-      data: updateData,
-    })
+    try {
+      await payload.update({
+        collection: 'kb-articles',
+        id: articleId,
+        data: updateData,
+      })
+    } catch (updateError) {
+      console.error('Payload update error:', updateError)
+      throw updateError
+    }
 
     // Increment user's edit count if user exists
     if (discordUser) {
-      await payload.update({
-        collection: 'discord-users',
-        id: user.id,
-        data: {
-          editCount: (discordUser.editCount || 0) + 1,
-        },
-      })
+      try {
+        await payload.update({
+          collection: 'discord-users',
+          id: user.id,
+          data: {
+            editCount: (discordUser.editCount || 0) + 1,
+          },
+        })
+      } catch (userUpdateError) {
+        console.error('User edit count update error:', userUpdateError)
+        // Non-fatal, don't throw
+      }
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Edit error:', error)
-    return NextResponse.json({ error: 'Failed to save' }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return NextResponse.json({ error: `Failed to save: ${errorMessage}` }, { status: 500 })
   }
 }
