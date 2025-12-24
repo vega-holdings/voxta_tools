@@ -145,7 +145,6 @@ export default async function AccountPage() {
 
         <div className="account-info">
           <h1>{user.displayName}</h1>
-          <p className="account-discord-id"><code>{user.discordId}</code></p>
           {isAdmin && <span className="admin-badge">Admin</span>}
         </div>
       </div>
