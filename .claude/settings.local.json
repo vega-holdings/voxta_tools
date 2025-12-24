@@ -144,7 +144,8 @@
       "Bash(find:*)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"PRAGMA table_info\\(users\\);\")",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"INSERT INTO users \\(email, salt, hash, created_at, updated_at\\) VALUES \\(''daisukearamaki@admin.local'', ''222e276d6ba0a7c3814ac17cb8689daa'', ''c29ee9aae791844f54e1e8d82288775fd4ddac725c370cab0e02c5b64d5af5a7857c0efb918d6eb4dd625902bae0d2d2845caf142d854bbbe6e87efb3da51fb6'', datetime\\(''now''\\), datetime\\(''now''\\)\\);\")",
-      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=create-admin.sql)"
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=create-admin.sql)",
+      "Bash(npx payload generate:importmap)"
     ]
   }
 }
