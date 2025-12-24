@@ -138,6 +138,13 @@ export const KBArticle: CollectionConfig = {
       },
     },
     {
+      name: 'lastEditedByDiscordId',
+      type: 'text',
+      admin: {
+        description: 'Discord ID of last editor (for attribution)',
+      },
+    },
+    {
       name: 'lastEditedAt',
       type: 'date',
       admin: {

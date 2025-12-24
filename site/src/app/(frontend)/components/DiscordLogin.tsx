@@ -37,8 +37,10 @@ export function DiscordLogin() {
   if (user) {
     return (
       <div className="discord-user">
-        {user.avatar && <Image src={user.avatar} alt="" width={24} height={24} className="discord-avatar" unoptimized />}
-        <span className="discord-name">{user.displayName}</span>
+        <a href="/account" className="discord-user-link">
+          {user.avatar && <Image src={user.avatar} alt="" width={24} height={24} className="discord-avatar" unoptimized />}
+          <span className="discord-name">{user.displayName}</span>
+        </a>
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/api/auth/logout" className="discord-logout">Logout</a>
       </div>

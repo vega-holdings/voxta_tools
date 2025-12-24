@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
   }
 
-  let user: { id: number; displayName: string }
+  let user: { id: number; discordId: string; displayName: string }
   try {
     user = JSON.parse(userCookie.value)
   } catch {
@@ -69,12 +69,12 @@ export async function POST(request: NextRequest) {
 
     const now = new Date().toISOString()
 
-    // Build update data - just title, content, and text fields first
-    // Skip relationship and array fields to isolate the issue
+    // Build update data
     const updateData: Record<string, unknown> = {
       title,
       content,
       lastEditedByName: user.displayName,
+      lastEditedByDiscordId: user.discordId,
       lastEditedAt: now,
     }
 
