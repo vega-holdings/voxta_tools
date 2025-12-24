@@ -1287,6 +1287,22 @@ main {
   font-size: 0.875rem;
 }
 
+.download-button {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.download-button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .site-header {

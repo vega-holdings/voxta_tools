@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { MarkdownContent } from '@/components/MarkdownContent'
+import { DownloadButton } from '../../components/DownloadButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,6 +63,7 @@ export default async function DocPage({ params }: PageProps) {
             <span>Original</span>
           </a>
         )}
+        <DownloadButton content={doc.content || ''} filename={doc.slug} title={doc.title} />
       </div>
 
       <div className="doc-content">
