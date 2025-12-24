@@ -57,8 +57,8 @@ export default async function KBArticlePage({ params }: PageProps) {
 
   if (userCookie) {
     try {
-      const user = JSON.parse(userCookie.value) as { isGuildMember?: boolean }
-      isGuildMember = user.isGuildMember || false
+      const user = JSON.parse(userCookie.value) as { isGuildMember?: boolean; isAdmin?: boolean }
+      isGuildMember = user.isGuildMember || user.isAdmin || false
     } catch {
       // Invalid cookie
     }

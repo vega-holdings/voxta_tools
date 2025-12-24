@@ -15,10 +15,11 @@ export const DocsPage: CollectionConfig = {
     create: () => true,
     update: () => true,
   },
-  versions: {
-    drafts: true,
-    maxPerDoc: 25,
-  },
+  // Versioning disabled until version tables are created via migrations
+  // versions: {
+  //   drafts: true,
+  //   maxPerDoc: 25,
+  // },
   hooks: {
     afterChange: [vectorizeAfterChange, githubSyncAfterChange],
     afterDelete: [vectorizeAfterDelete],

@@ -24,15 +24,15 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
   }
 
-  let user: { id: number; discordId: string; username: string; displayName: string; isGuildMember?: boolean }
+  let user: { id: number; discordId: string; username: string; displayName: string; isGuildMember?: boolean; isAdmin?: boolean }
   try {
     user = JSON.parse(userCookie.value)
   } catch {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
   }
 
-  // Only guild members can restore versions
-  if (!user.isGuildMember) {
+  // Only guild members can restore versions (admins can bypass)
+  if (!user.isGuildMember && !user.isAdmin) {
     return NextResponse.json({ error: 'Guild membership required' }, { status: 403 })
   }
 

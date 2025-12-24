@@ -23,6 +23,7 @@ interface D1User {
   display_name: string
   avatar: string | null
   is_guild_member: number | null
+  is_admin: number | null
 }
 
 interface DiscordGuild {
@@ -107,7 +108,7 @@ export async function GET(request: NextRequest) {
 
     // Check if user exists
     const existing = await db.prepare(
-      'SELECT id, discord_id, username, display_name, avatar FROM discord_users WHERE discord_id = ?'
+      'SELECT id, discord_id, username, display_name, avatar, is_admin FROM discord_users WHERE discord_id = ?'
     ).bind(discordUser.id).first<D1User>()
 
     let userId: number
@@ -163,6 +164,9 @@ export async function GET(request: NextRequest) {
     // Create session cookie
     const response = NextResponse.redirect(new URL('/leaderboard?login=success', request.url))
 
+    // Check if user is admin
+    const isAdmin = existing?.is_admin === 1
+
     response.cookies.set('discord_user', JSON.stringify({
       id: userId,
       discordId: discordUser.id,
@@ -170,6 +174,7 @@ export async function GET(request: NextRequest) {
       displayName: displayName,
       avatar: avatarUrl,
       isGuildMember: isGuildMember,
+      isAdmin: isAdmin,
     }), {
       httpOnly: true,
       secure: true,

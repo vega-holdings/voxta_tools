@@ -15,6 +15,7 @@ interface UserCookie {
   username: string
   displayName: string
   isGuildMember?: boolean
+  isAdmin?: boolean
 }
 
 export async function POST(request: NextRequest) {
@@ -31,8 +32,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
   }
 
-  // Check guild membership
-  if (!user.isGuildMember) {
+  // Check guild membership (admins can bypass)
+  if (!user.isGuildMember && !user.isAdmin) {
     return NextResponse.json(
       { error: 'You must be a member of the Voxta Discord server to create articles' },
       { status: 403 }

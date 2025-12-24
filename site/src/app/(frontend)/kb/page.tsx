@@ -13,6 +13,7 @@ export const metadata = {
 
 interface UserCookie {
   isGuildMember?: boolean
+  isAdmin?: boolean
 }
 
 export default async function KBListPage() {
@@ -24,7 +25,7 @@ export default async function KBListPage() {
   if (userCookie) {
     try {
       const user = JSON.parse(userCookie.value) as UserCookie
-      isGuildMember = user.isGuildMember || false
+      isGuildMember = user.isGuildMember || user.isAdmin || false
     } catch {
       // Invalid cookie
     }

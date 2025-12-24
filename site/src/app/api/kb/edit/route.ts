@@ -15,15 +15,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
   }
 
-  let user: { id: number; discordId: string; username: string; displayName: string; isGuildMember?: boolean }
+  let user: { id: number; discordId: string; username: string; displayName: string; isGuildMember?: boolean; isAdmin?: boolean }
   try {
     user = JSON.parse(userCookie.value)
   } catch {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
   }
 
-  // Check guild membership
-  if (!user.isGuildMember) {
+  // Check guild membership (admins can bypass)
+  if (!user.isGuildMember && !user.isAdmin) {
     return NextResponse.json(
       { error: 'You must be a member of the Voxta Discord server to edit articles' },
       { status: 403 }
