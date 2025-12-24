@@ -92,12 +92,18 @@ export default async function LeaderboardPage() {
             </span>
 
             <div style={{ flex: 1 }}>
-              <div style={{
-                fontWeight: index < 3 ? 'bold' : 'normal',
-                fontSize: index < 3 ? '1.25rem' : '1rem',
-              }}>
+              <Link
+                href={`/contributor/${encodeURIComponent(contributor.name)}`}
+                style={{
+                  fontWeight: index < 3 ? 'bold' : 'normal',
+                  fontSize: index < 3 ? '1.25rem' : '1rem',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                }}
+                className="contributor-link"
+              >
                 {contributor.name}
-              </div>
+              </Link>
               <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
                 {contributor.categories.size} {contributor.categories.size === 1 ? 'category' : 'categories'}
               </div>

@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { MarkdownContent } from '@/components/MarkdownContent'
+import { cookies } from 'next/headers'
+import { EditButton } from './EditButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,21 +47,43 @@ export default async function KBArticlePage({ params }: PageProps) {
   const article = result.docs[0]
   if (!article) notFound()
 
+  // Check if user is logged in
+  const cookieStore = await cookies()
+  const userCookie = cookieStore.get('discord_user')
+  const isLoggedIn = !!userCookie
+
   // Parse topics and keywords
   const topics = article.topics as Array<{ topic: string }> | undefined
   const keywords = article.keywords as Array<{ keyword: string }> | undefined
+
+  // Format last edited date
+  const lastEditedAt = article.lastEditedAt ? new Date(article.lastEditedAt).toLocaleDateString() : null
 
   return (
     <div className="kb-page">
       <Link href="/kb" className="back-link">&larr; Back to Knowledge Base</Link>
 
-      <h1>{article.title}</h1>
+      <div className="kb-header">
+        <div>
+          <h1>{article.title}</h1>
+          {lastEditedAt && article.lastEditedByName && (
+            <p className="last-edited">
+              Last edited by {article.lastEditedByName} on {lastEditedAt}
+            </p>
+          )}
+        </div>
+        {isLoggedIn && <EditButton slug={slug} />}
+      </div>
 
       <div className="kb-meta">
         {article.type && <span>{article.type}</span>}
         {article.category && <span>{article.category}</span>}
         {article.confidence && <span>{Math.round(article.confidence * 100)}% confidence</span>}
-        {article.contributor && <span>By {article.contributor}</span>}
+        {article.contributor && (
+          <Link href={`/contributor/${encodeURIComponent(article.contributor)}`}>
+            By {article.contributor}
+          </Link>
+        )}
       </div>
 
       <div className="kb-content">
