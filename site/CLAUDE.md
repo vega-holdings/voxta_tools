@@ -21,6 +21,7 @@ A searchable documentation site for Voxta built with:
 | docs-pages | 84 | Official documentation + dev guides |
 | kb-articles | 1,005 | Community knowledge base articles |
 | discord-users | varies | Users who logged in via Discord |
+| contributor_mappings | 754 | Discord ID to contributor name mappings (from scraper) |
 
 ## PayloadCMS Collections
 
@@ -31,13 +32,14 @@ A searchable documentation site for Voxta built with:
 
 ### KBArticle (`src/collections/KBArticle.ts`)
 - Fields: title, slug, content (textarea), type, category, topics[], keywords[], confidence
-- **Contributor tracking**: contributor (original name), originalContributor, lastEditedBy, lastEditedByName, lastEditedAt, editHistory[]
+- **Contributor tracking**: contributor (original name), originalContributor, lastEditedBy, lastEditedByName, lastEditedByDiscordId, lastEditedAt, editHistory[]
 - Edit tracking fields link to DiscordUsers
 
 ### DiscordUsers (`src/collections/DiscordUsers.ts`)
-- Fields: discordId, username, displayName, avatar, claimedContributorNames[], editCount, lastLogin, isAdmin
-- `claimedContributorNames`: Array of contributor names claimed by this user
+- Fields: discordId, username, displayName, avatar, claimedContributorNames[], editCount, lastLogin, isAdmin, displayPreference
+- `claimedContributorNames`: Array of contributor names claimed/auto-linked to this user
 - `isAdmin`: Boolean for admin privileges
+- `displayPreference`: 'username' or 'displayName' - controls how name appears on edits
 
 ## User Features
 
@@ -46,17 +48,28 @@ A searchable documentation site for Voxta built with:
 - OAuth callback at `/api/auth/discord/callback`
 - User session stored in `discord_user` cookie
 - `/api/auth/me` returns current user, `/api/auth/logout` clears session
+- **Auto-association**: On login, checks `contributor_mappings` table and auto-claims contributor name
 
-### Contributor Profiles
-- `/contributor/[name]` shows articles by that contributor
-- Logged-in users can claim contributor names to link to their Discord
+### User Account Page (`/account`)
+- Shows user profile with avatar and display name
+- Stats: original contributions, edits made, claimed names
+- Lists claimed contributor names (clickable to profile)
+- Shows original contributions and recent edits
+- **Settings**: Choose display preference (username vs display name)
+
+### Contributor Profiles (`/contributor/[name]`)
+- Shows articles by that contributor
+- Auto-linked when Discord user logs in (via contributor_mappings)
 - Claimed profiles show Discord avatar and display name
 
 ### KB Article Editing
 - Logged-in users see "Edit" button on KB articles
 - Edit page at `/kb/[slug]/edit` with title and markdown content
 - `/api/kb/edit` saves changes via PayloadCMS
-- Tracks last edited by and maintains edit history
+- Tracks lastEditedByName (uses user's displayPreference), lastEditedByDiscordId, lastEditedAt
+
+### Documentation Download
+- Doc pages have "DL .md" button to download content as markdown file
 
 ## Commands
 
@@ -86,24 +99,25 @@ site/
 ├── src/
 │   ├── app/
 │   │   ├── (frontend)/           # Public pages
-│   │   │   ├── docs/[slug]/      # Doc detail pages
+│   │   │   ├── docs/[slug]/      # Doc detail pages (with DL button)
 │   │   │   ├── kb/[slug]/        # KB article pages
 │   │   │   │   └── edit/         # KB edit page
 │   │   │   ├── contributor/[name]/ # Contributor profiles
+│   │   │   ├── account/          # User account page + settings
 │   │   │   ├── docs/page.tsx     # Docs list (grouped by category)
 │   │   │   ├── kb/page.tsx       # KB list
 │   │   │   ├── leaderboard/      # Top contributors page
-│   │   │   ├── components/       # HeaderSearch, DiscordLogin
+│   │   │   ├── components/       # HeaderSearch, DiscordLogin, DownloadButton
 │   │   │   └── page.tsx          # Homepage with search + quick-links
 │   │   ├── (payload)/            # PayloadCMS admin UI
 │   │   └── api/
 │   │       ├── search/route.ts   # Vector search endpoint
 │   │       ├── auth/             # Discord OAuth routes
-│   │       │   ├── discord/      # OAuth initiate & callback
+│   │       │   ├── discord/      # OAuth initiate & callback (with auto-claim)
 │   │       │   ├── me/           # Get current user
 │   │       │   └── logout/       # Clear session
 │   │       ├── kb/edit/          # KB article editing
-│   │       ├── contributor/claim/ # Claim contributor name
+│   │       ├── user/settings/    # User settings (display preference)
 │   │       └── admin/
 │   │           └── populate-vectors/route.ts
 │   ├── collections/
@@ -125,12 +139,19 @@ site/
 |----------|--------|-------------|
 | `/api/search?q=query` | GET | Vector search for docs and KB |
 | `/api/auth/discord` | GET | Initiate Discord OAuth |
-| `/api/auth/discord/callback` | GET | OAuth callback |
+| `/api/auth/discord/callback` | GET | OAuth callback (auto-claims contributor) |
 | `/api/auth/me` | GET | Get current logged-in user |
 | `/api/auth/logout` | GET | Clear session cookie |
 | `/api/kb/edit` | POST | Update KB article (requires login) |
-| `/api/contributor/claim` | POST | Claim contributor name (requires login) |
+| `/api/user/settings` | POST | Update user settings (display preference) |
 | `/api/admin/populate-vectors` | POST | Populate Vectorize index |
+
+## D1 Tables (beyond Payload)
+
+| Table | Description |
+|-------|-------------|
+| `contributor_mappings` | Maps Discord IDs to contributor usernames (from scraper dkm.db) |
+| `discord_users_claimed_contributor_names` | Payload array field storage for claimed names |
 
 ## Cloudflare Configuration
 
@@ -142,7 +163,6 @@ site/
 
 ### Secrets (set via wrangler)
 ```bash
-# Set secrets for the worker
 npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler secret put PAYLOAD_SECRET --name voxta-unoffical-docs
 npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler secret put DISCORD_CLIENT_ID --name voxta-unoffical-docs
 npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler secret put DISCORD_CLIENT_SECRET --name voxta-unoffical-docs
@@ -158,6 +178,12 @@ npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler secret put NEXT_PUBLIC_APP_U
 
 ## Data Import
 
+### Import Contributor Mappings (from scraper dkm.db)
+```bash
+python import-contributor-mappings.py
+npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler d1 execute voxta-docs --remote --file=import-contributor-mappings.sql
+```
+
 ### Import Docs
 ```bash
 node clean-import-docs.cjs
@@ -167,7 +193,6 @@ npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler d1 execute voxta-docs --remo
 ### Import KB Articles
 ```bash
 node clean-import-kb.cjs
-# Execute each batch file (kb-0.sql through kb-N.sql)
 npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler d1 execute voxta-docs --remote --file=clean-import-kb-0.sql
 ```
 
@@ -175,12 +200,6 @@ npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler d1 execute voxta-docs --remo
 ```bash
 PAYLOAD_SECRET=your-secret node populate-vectors.js
 ```
-
-## Admin Access
-
-PayloadCMS admin panel: `https://voxta.axailotl.ai/admin`
-
-Admin users are managed in the `users` collection in PayloadCMS.
 
 ## Troubleshooting
 
@@ -195,6 +214,11 @@ Admin users are managed in the `users` collection in PayloadCMS.
 **Edits not saving**
 - Check user is logged in (cookie present)
 - Verify PayloadCMS can write to D1
+- Check `payload_locked_documents_rels` has columns for all collections
+
+**Contributor not auto-linked on login**
+- Check `contributor_mappings` table has user's Discord ID
+- Import from dkm.db using `import-contributor-mappings.py`
 
 **D1 errors on deploy**
 - Run migrations: `pnpm payload migrate`
