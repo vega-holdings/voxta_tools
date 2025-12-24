@@ -110,7 +110,10 @@
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler pages secret put DISCORD_CLIENT_ID --project-name voxta-unoffical-docs)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put DISCORD_CLIENT_ID --name voxta-unoffical-docs)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put DISCORD_CLIENT_SECRET --name voxta-unoffical-docs)",
-      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put NEXT_PUBLIC_APP_URL --name voxta-unoffical-docs)"
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler secret put NEXT_PUBLIC_APP_URL --name voxta-unoffical-docs)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"ALTER TABLE discord_users ADD COLUMN is_admin INTEGER DEFAULT 0;\")",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"UPDATE discord_users SET is_admin = 1 WHERE discord_id = ''388908766306893854'';\")",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"SELECT id, discord_id, username, display_name, is_admin FROM discord_users WHERE discord_id = ''388908766306893854'';\")"
     ]
   }
 }

@@ -12,6 +12,7 @@ A searchable documentation site for Voxta built with:
 - **Cloudflare Vectorize** - Vector search index (384 dimensions, cosine metric)
 - **Cloudflare Workers AI** - Embedding generation (`@cf/baai/bge-small-en-v1.5`)
 - **OpenNext** - Adapter for deploying Next.js to Cloudflare
+- **Discord OAuth** - User authentication via Discord
 
 ## Content
 
@@ -19,16 +20,43 @@ A searchable documentation site for Voxta built with:
 |------------|-------|-------------|
 | docs-pages | 84 | Official documentation + dev guides |
 | kb-articles | 1,005 | Community knowledge base articles |
+| discord-users | varies | Users who logged in via Discord |
 
-### Doc Categories
+## PayloadCMS Collections
 
-Docs are organized by category with sort order:
-- `documentation` - Overview, getting started, glossary, terms
-- `installing` - Install/update server
-- `interface` - UI screens and features
-- `creator-studio` - Scenarios, memory books, actions, scripting
-- `modules` - Service providers (LLM, TTS, STT, etc.)
-- `articles` - Guides, FAQs, dev documentation
+### DocsPage (`src/collections/DocsPage.ts`)
+- Fields: title, slug, content (textarea), category, sortOrder, originalUrl, relatedKB
+- `category`: One of documentation, installing, interface, creator-studio, modules, articles
+- `sortOrder`: Number for ordering within category (lower = first)
+
+### KBArticle (`src/collections/KBArticle.ts`)
+- Fields: title, slug, content (textarea), type, category, topics[], keywords[], confidence
+- **Contributor tracking**: contributor (original name), originalContributor, lastEditedBy, lastEditedByName, lastEditedAt, editHistory[]
+- Edit tracking fields link to DiscordUsers
+
+### DiscordUsers (`src/collections/DiscordUsers.ts`)
+- Fields: discordId, username, displayName, avatar, claimedContributorNames[], editCount, lastLogin, isAdmin
+- `claimedContributorNames`: Array of contributor names claimed by this user
+- `isAdmin`: Boolean for admin privileges
+
+## User Features
+
+### Discord Login
+- Login button in header navigates to `/api/auth/discord`
+- OAuth callback at `/api/auth/discord/callback`
+- User session stored in `discord_user` cookie
+- `/api/auth/me` returns current user, `/api/auth/logout` clears session
+
+### Contributor Profiles
+- `/contributor/[name]` shows articles by that contributor
+- Logged-in users can claim contributor names to link to their Discord
+- Claimed profiles show Discord avatar and display name
+
+### KB Article Editing
+- Logged-in users see "Edit" button on KB articles
+- Edit page at `/kb/[slug]/edit` with title and markdown content
+- `/api/kb/edit` saves changes via PayloadCMS
+- Tracks last edited by and maintains edit history
 
 ## Commands
 
@@ -46,6 +74,9 @@ pnpm payload migrate        # Run Payload migrations on local D1
 
 # Type checking
 npx tsc --noEmit           # Check TypeScript without emitting
+
+# Secrets (use correct project name!)
+npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler secret put SECRET_NAME --name voxta-unoffical-docs
 ```
 
 ## Project Structure
@@ -57,19 +88,29 @@ site/
 │   │   ├── (frontend)/           # Public pages
 │   │   │   ├── docs/[slug]/      # Doc detail pages
 │   │   │   ├── kb/[slug]/        # KB article pages
+│   │   │   │   └── edit/         # KB edit page
+│   │   │   ├── contributor/[name]/ # Contributor profiles
 │   │   │   ├── docs/page.tsx     # Docs list (grouped by category)
 │   │   │   ├── kb/page.tsx       # KB list
 │   │   │   ├── leaderboard/      # Top contributors page
+│   │   │   ├── components/       # HeaderSearch, DiscordLogin
 │   │   │   └── page.tsx          # Homepage with search + quick-links
 │   │   ├── (payload)/            # PayloadCMS admin UI
 │   │   └── api/
 │   │       ├── search/route.ts   # Vector search endpoint
+│   │       ├── auth/             # Discord OAuth routes
+│   │       │   ├── discord/      # OAuth initiate & callback
+│   │       │   ├── me/           # Get current user
+│   │       │   └── logout/       # Clear session
+│   │       ├── kb/edit/          # KB article editing
+│   │       ├── contributor/claim/ # Claim contributor name
 │   │       └── admin/
-│   │           └── populate-vectors/route.ts  # Admin: populate Vectorize
+│   │           └── populate-vectors/route.ts
 │   ├── collections/
-│   │   ├── DocsPages.ts          # docs-pages collection schema
-│   │   ├── KBArticles.ts         # kb-articles collection schema
-│   │   └── Media.ts              # Media uploads
+│   │   ├── DocsPage.ts
+│   │   ├── KBArticle.ts
+│   │   ├── DiscordUsers.ts
+│   │   └── Media.ts
 │   ├── components/
 │   │   ├── MarkdownContent.tsx   # Markdown renderer with link transformation
 │   │   └── SearchForm.tsx        # Search UI component
@@ -78,56 +119,37 @@ site/
 └── populate-vectors.js           # Script to populate Vectorize index
 ```
 
-## Key Files
+## API Endpoints
 
-### Collections
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/search?q=query` | GET | Vector search for docs and KB |
+| `/api/auth/discord` | GET | Initiate Discord OAuth |
+| `/api/auth/discord/callback` | GET | OAuth callback |
+| `/api/auth/me` | GET | Get current logged-in user |
+| `/api/auth/logout` | GET | Clear session cookie |
+| `/api/kb/edit` | POST | Update KB article (requires login) |
+| `/api/contributor/claim` | POST | Claim contributor name (requires login) |
+| `/api/admin/populate-vectors` | POST | Populate Vectorize index |
 
-**DocsPages** (`src/collections/DocsPages.ts`)
-- Fields: title, slug, content (textarea), category, sortOrder, originalUrl, relatedKB
-- `category`: One of documentation, installing, interface, creator-studio, modules, articles
-- `sortOrder`: Number for ordering within category (lower = first)
+## Cloudflare Configuration
 
-**KBArticles** (`src/collections/KBArticles.ts`)
-- Fields: title, slug, content (textarea), type, category, topics[], keywords[], confidence, contributor
+### Project
+- **Name**: `voxta-unoffical-docs`
+- **Database**: `voxta-docs` (D1)
+- **Bucket**: `voxta-docs` (R2)
+- **Index**: `voxta-docs-index` (Vectorize)
 
-### API Endpoints
-
-**GET /api/search?q=query**
-- Generates embedding for query using Workers AI
-- Queries Vectorize for similar documents
-- Returns top 10 matches with metadata
-
-**POST /api/admin/populate-vectors**
-- Protected by `x-admin-secret` header (must match PAYLOAD_SECRET)
-- Query params: `collection` (docs|kb|all), `batch` (default 50), `page`
-- Generates embeddings and upserts to Vectorize
-
-### Components
-
-**MarkdownContent** (`src/components/MarkdownContent.tsx`)
-- Renders markdown with remark-gfm (tables, strikethrough, etc.)
-- Transforms `https://doc.voxta.ai/docs/X/` links to local `/docs/X`
-- Strips first heading to avoid duplicate titles
-- External links open in new tab
-
-## Cloudflare Bindings (wrangler.jsonc)
-
-```jsonc
-{
-  "d1_databases": [{ "binding": "DB", "database_name": "voxta-docs", "database_id": "..." }],
-  "r2_buckets": [{ "binding": "R2", "bucket_name": "voxta-docs" }],
-  "vectorize": [{ "binding": "VECTORIZE", "index_name": "voxta-docs-index" }],
-  "ai": { "binding": "AI" }
-}
+### Secrets (set via wrangler)
+```bash
+# Set secrets for the worker
+npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler secret put PAYLOAD_SECRET --name voxta-unoffical-docs
+npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler secret put DISCORD_CLIENT_ID --name voxta-unoffical-docs
+npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler secret put DISCORD_CLIENT_SECRET --name voxta-unoffical-docs
+npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler secret put NEXT_PUBLIC_APP_URL --name voxta-unoffical-docs
 ```
 
-## Cloudflare Project
-
-- **Project Name**: `voxta-unoffical-docs`
-- Use `wrangler secret put <NAME> --name voxta-unoffical-docs` to set secrets
-
-## Environment Variables
-
+### Environment Variables
 - `PAYLOAD_SECRET` - Secret for Payload admin & API auth
 - `CLOUDFLARE_API_TOKEN` - For wrangler CLI operations
 - `DISCORD_CLIENT_ID` - Discord OAuth app client ID
@@ -136,83 +158,43 @@ site/
 
 ## Data Import
 
-### Import Docs (from parent directory markdown files)
-
+### Import Docs
 ```bash
-# Generate SQL from docs-*.md files
 node clean-import-docs.cjs
-
-# Execute against remote D1
 npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler d1 execute voxta-docs --remote --file=clean-import-docs.sql
 ```
 
-### Import KB Articles (from kb/ directory)
-
+### Import KB Articles
 ```bash
-# Generate batched SQL files from kb/**/*.md
 node clean-import-kb.cjs
-
-# Execute each batch (kb has 1000+ articles, needs batching)
+# Execute each batch file (kb-0.sql through kb-N.sql)
 npx cross-env CLOUDFLARE_API_TOKEN=xxx npx wrangler d1 execute voxta-docs --remote --file=clean-import-kb-0.sql
-# ... repeat for each batch file
 ```
 
 ### Populate Vector Index
-
-After importing content, populate Vectorize with embeddings:
-
 ```bash
 PAYLOAD_SECRET=your-secret node populate-vectors.js
 ```
 
-Or manually via API:
-```bash
-curl -X POST "https://your-site.workers.dev/api/admin/populate-vectors?collection=all&batch=50&page=1" \
-  -H "x-admin-secret: your-payload-secret"
-```
-
-## Search Implementation
-
-1. User enters query in SearchForm
-2. `/api/search` generates embedding via Workers AI
-3. Vectorize returns top matches with metadata (title, slug, collection, category)
-4. Results displayed with links to `/docs/[slug]` or `/kb/[slug]`
-
-Vector IDs use prefixes: `docs-{id}` or `kb-{id}`
-
-## Link Transformation
-
-The MarkdownContent component automatically transforms links:
-- `https://doc.voxta.ai/docs/getting-started/` → `/docs/getting-started`
-- `https://doc.voxta.ai/docs/services/#section` → `/docs/services#section`
-- External links remain unchanged and open in new tab
-
-## Deployment
-
-Deploys automatically via Cloudflare Pages when pushing to main branch.
-
-Manual deploy:
-```bash
-pnpm build && pnpm deploy
-```
-
 ## Admin Access
 
-PayloadCMS admin panel: `https://your-site.workers.dev/admin`
+PayloadCMS admin panel: `https://voxta.axailotl.ai/admin`
 
-First user registration creates admin account.
+Admin users are managed in the `users` collection in PayloadCMS.
 
 ## Troubleshooting
+
+**Discord login shows "not configured"**
+- Ensure DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET secrets are set
+- Use `wrangler secret put --name voxta-unoffical-docs`
 
 **Search returns no results**
 - Vectorize index may be empty
 - Run `populate-vectors.js` to index all content
 
-**Markdown tables not rendering**
-- Ensure MarkdownContent component is used (includes remark-gfm)
-
-**Links point to official docs**
-- Ensure MarkdownContent component is used (includes link transformation)
+**Edits not saving**
+- Check user is logged in (cookie present)
+- Verify PayloadCMS can write to D1
 
 **D1 errors on deploy**
 - Run migrations: `pnpm payload migrate`

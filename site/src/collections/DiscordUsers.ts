@@ -74,5 +74,13 @@ export const DiscordUsers: CollectionConfig = {
         description: 'Last login time',
       },
     },
+    {
+      name: 'isAdmin',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'Has admin privileges',
+      },
+    },
   ],
 }
