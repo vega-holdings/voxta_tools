@@ -30,6 +30,9 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      afterLogin: ['/components/admin/DiscordLoginButton'],
+    },
   },
   collections: [Users, Media, DocsPage, KBArticle, DiscordUsers],
   editor: lexicalEditor(),

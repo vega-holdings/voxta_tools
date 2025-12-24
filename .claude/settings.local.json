@@ -141,7 +141,10 @@
       "Bash(set PAYLOAD_SECRET=e7d9f2e15952e5220b4acdbca31a4f98052467f53dd603697d1578acf2155e15:*)",
       "Bash(npx opennextjs-cloudflare build:*)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"CREATE TABLE IF NOT EXISTS discord_users_rels \\(id INTEGER PRIMARY KEY AUTOINCREMENT, parent_id INTEGER NOT NULL REFERENCES discord_users\\(id\\) ON DELETE CASCADE, path TEXT NOT NULL, kb_articles_id INTEGER REFERENCES kb_articles\\(id\\) ON DELETE CASCADE, docs_pages_id INTEGER REFERENCES docs_pages\\(id\\) ON DELETE CASCADE, \"\"order\"\" INTEGER\\);\")",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"PRAGMA table_info\\(users\\);\")",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --command=\"INSERT INTO users \\(email, salt, hash, created_at, updated_at\\) VALUES \\(''daisukearamaki@admin.local'', ''222e276d6ba0a7c3814ac17cb8689daa'', ''c29ee9aae791844f54e1e8d82288775fd4ddac725c370cab0e02c5b64d5af5a7857c0efb918d6eb4dd625902bae0d2d2845caf142d854bbbe6e87efb3da51fb6'', datetime\\(''now''\\), datetime\\(''now''\\)\\);\")",
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=create-admin.sql)"
     ]
   }
 }
