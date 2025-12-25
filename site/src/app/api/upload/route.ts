@@ -58,8 +58,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate mime type
-    if (!ALLOWED_MIME_TYPES.includes(file.type) && file.type !== '') {
+    // Validate mime type (allow octet-stream since browsers often send it for text files)
+    const isValidMime = ALLOWED_MIME_TYPES.includes(file.type) ||
+                        file.type === '' ||
+                        file.type === 'application/octet-stream'
+    if (!isValidMime) {
       return NextResponse.json(
         { error: `Invalid mime type: ${file.type}` },
         { status: 400 }

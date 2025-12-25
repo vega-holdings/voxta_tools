@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, lazy, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
+
+const MilkdownEditor = lazy(() => import('@/components/MilkdownEditor').then(m => ({ default: m.MilkdownEditor })))
 
 interface Attachment {
   id?: string
@@ -139,15 +141,14 @@ export function EditForm({ articleId, slug, initialTitle, initialContent, initia
       </div>
 
       <div className="form-group">
-        <label htmlFor="content">Content (Markdown)</label>
-        <textarea
-          id="content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-          className="form-textarea"
-          rows={20}
-        />
+        <label>Content (Markdown)</label>
+        <Suspense fallback={<div className="form-textarea" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading editor...</div>}>
+          <MilkdownEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Write your article content in Markdown..."
+          />
+        </Suspense>
       </div>
 
       <div className="form-group">

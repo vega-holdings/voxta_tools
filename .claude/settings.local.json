@@ -163,7 +163,9 @@
       "Bash(npx payload migrate:status)",
       "Bash(PAYLOAD_SECRET=e7d9f2e15952e5220b4acdbca31a4f98052467f53dd603697d1578acf2155e15 npx payload migrate:status:*)",
       "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=E:/_DEV/_All_Voxta/voxta_unoffical_docs/site/check-versions-exist.sql)",
-      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=create-attachments-tables.sql)"
+      "Bash(npx cross-env CLOUDFLARE_API_TOKEN=OSpSS9jvHd9ZJ4Z0nIVOJGV-OY-GrfAI7KYyrpM3 npx wrangler d1 execute voxta-docs --remote --file=create-attachments-tables.sql)",
+      "Bash(pnpm add:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

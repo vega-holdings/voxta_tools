@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, lazy, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
+
+const MilkdownEditor = lazy(() => import('@/components/MilkdownEditor').then(m => ({ default: m.MilkdownEditor })))
 
 interface UploadedFile {
   id: number
@@ -156,15 +158,14 @@ export function NewDocForm() {
       </div>
 
       <div className="form-group">
-        <label htmlFor="content">Content (Markdown)</label>
-        <textarea
-          id="content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Write your documentation content in Markdown..."
-          rows={20}
-          required
-        />
+        <label>Content (Markdown)</label>
+        <Suspense fallback={<div className="form-textarea" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading editor...</div>}>
+          <MilkdownEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Write your documentation content in Markdown..."
+          />
+        </Suspense>
       </div>
 
       <div className="form-group">
